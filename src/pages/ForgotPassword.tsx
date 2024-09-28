@@ -1,4 +1,6 @@
 import React from 'react';
+import Logo from '../assets/images/logo.png';
+import FormImage from '../assets/images/form-image.png';
 
 const ForgotPassword: React.FC = () => {
 	const handleSubmit = (e: React.FormEvent) => {
@@ -8,7 +10,7 @@ const ForgotPassword: React.FC = () => {
 	return (
 		<div className='relative flex-col justify-between min-h-screen p-3 md:flex md:flex-row md:p-4 lg:p-5 xl:p-9 2xl:p-12'>
 			<div className='relative z-10 flex flex-col w-full gap-2 bg lg:w-1/2 md:gap-4 lg:gap-6 xl:gap-10'>
-				<img src='/public/images/logo.png' alt='logo' className='h-16 w-28' />
+				<img src={Logo} alt='logo' className='h-16 w-28' />
 				<div className='flex flex-col gap-3 md:gap-6 lg:gap-12'>
 					<div className='text-center'>
 						<h2 className='text-xl md:text-2xl lg:text-3xl 2xl:text-4xl font-semibold text-white lg:text-[#000]'>
@@ -48,17 +50,13 @@ const ForgotPassword: React.FC = () => {
 			</div>
 
 			<div className='hidden w-1/2 h-full lg:flex'>
-				<img
-					src='/public/images/form-image.png'
-					alt='form-image'
-					className='object-cover w-full h-full rounded-2xl'
-				/>
+				<img src={FormImage} alt='form-image' className='object-cover w-full h-full rounded-2xl' />
 			</div>
 
 			<div
 				className='absolute inset-0 bg-center bg-no-repeat bg-cover lg:hidden'
 				style={{
-					backgroundImage: "url('/public/images/form-image.png')",
+					backgroundImage: `url(${FormImage})`,
 				}}
 			>
 				<div className='absolute inset-0 bg-black opacity-80'></div>
