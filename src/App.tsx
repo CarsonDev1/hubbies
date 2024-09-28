@@ -34,7 +34,7 @@ const App: React.FC = () => {
 						</LoginLayout>
 					}
 				/>
-				<Route path='/' element={<Navigate to='/dashboard' />} />
+				<Route path='/' element={<Navigate to='/login' />} />
 				<Route
 					path='/dashboard'
 					element={
