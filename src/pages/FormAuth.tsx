@@ -65,18 +65,20 @@ const FormAuth: React.FC = () => {
 						className='w-full px-3 mx-auto space-y-4 lg:space-y-6 md:w-2/3 lg:w-3/4'
 						autoComplete='off'
 					>
-						<div>
-							<label htmlFor='email' className='block mb-2 text-sm font-semibold text-button-color'>
-								Email address
-							</label>
-							<input
-								id='email'
-								type='email'
-								className='w-full px-4 py-3 bg-white border rounded-full lg:bg-transparent border-button-color focus:outline-none focus:ring-0'
-								placeholder='Enter your email'
-								autoComplete='off'
-							/>
-						</div>
+						{!isLogin && (
+							<div>
+								<label htmlFor='email' className='block mb-2 text-sm font-semibold text-button-color'>
+									Email address
+								</label>
+								<input
+									id='email'
+									type='email'
+									className='w-full px-4 py-3 bg-white border rounded-full lg:bg-transparent border-button-color focus:outline-none focus:ring-0'
+									placeholder='Enter your email'
+									autoComplete='off'
+								/>
+							</div>
+						)}
 
 						<div>
 							<label htmlFor='username' className='block mb-2 text-sm font-semibold text-button-color'>
@@ -90,33 +92,28 @@ const FormAuth: React.FC = () => {
 							/>
 						</div>
 
-						{!isLogin && (
-							<div className='relative'>
-								<label
-									htmlFor='password'
-									className='block mb-2 text-sm font-semibold text-button-color'
-								>
-									Password
-								</label>
-								<input
-									id='password'
-									type={showPassword ? 'text' : 'password'}
-									className='w-full px-4 py-3 bg-white border rounded-full lg:bg-transparent border-button-color focus:outline-none focus:ring-0'
-									placeholder='Enter your Password'
-								/>
+						<div className='relative'>
+							<label htmlFor='password' className='block mb-2 text-sm font-semibold text-button-color'>
+								Password
+							</label>
+							<input
+								id='password'
+								type={showPassword ? 'text' : 'password'}
+								className='w-full px-4 py-3 bg-white border rounded-full lg:bg-transparent border-button-color focus:outline-none focus:ring-0'
+								placeholder='Enter your Password'
+							/>
 
-								<div
-									className='absolute flex items-center px-3 text-gray-600 cursor-pointer right-3 top-[55%]'
-									onClick={togglePasswordVisibility}
-								>
-									{showPassword ? (
-										<IoMdEyeOff className='text-button-color' />
-									) : (
-										<IoMdEye className='text-button-color' />
-									)}
-								</div>
+							<div
+								className='absolute flex items-center px-3 text-gray-600 cursor-pointer right-3 top-[55%]'
+								onClick={togglePasswordVisibility}
+							>
+								{showPassword ? (
+									<IoMdEyeOff className='text-button-color' />
+								) : (
+									<IoMdEye className='text-button-color' />
+								)}
 							</div>
-						)}
+						</div>
 
 						{isLogin && (
 							<div className='flex items-center justify-between pr-2'>
