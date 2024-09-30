@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginLayout from './layout/LoginLayout';
 import AdminLayout from './layout/AdminLayout';
 import FormAuth from './pages/FormAuth';
 import ForgotPassword from './pages/ForgotPassword';
+import RootLayout from './layout/RootLayout';
+import Home from './pages/Home';
 
 const Dashboard = React.lazy(() => import('./pages/DashBoard'));
 const UserManagement = React.lazy(() => import('./pages/UserManagement'));
@@ -34,7 +36,14 @@ const App: React.FC = () => {
 						</LoginLayout>
 					}
 				/>
-				<Route path='/' element={<Navigate to='/login' />} />
+				<Route
+					path='/'
+					element={
+						<RootLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+							<Home />
+						</RootLayout>
+					}
+				/>
 				<Route
 					path='/dashboard'
 					element={
