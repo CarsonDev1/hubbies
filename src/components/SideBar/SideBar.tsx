@@ -1,7 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { FiUsers, FiFileText, FiBarChart2, FiBell, FiSettings, FiLogIn, FiLogOut } from 'react-icons/fi';
-import { AuthContext } from '../../contexts/AuthContext';
+import { FiBell, FiSettings } from 'react-icons/fi';
+import { HiOutlineHome } from 'react-icons/hi';
+import { RxDashboard } from 'react-icons/rx';
+import { LuUser2 } from 'react-icons/lu';
+import { RiLogoutCircleRLine } from 'react-icons/ri';
+import Logo from '../../assets/images/logo.png';
 
 interface SidebarProps {
 	activeTab: string;
@@ -9,34 +13,34 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ setActiveTab }) => {
-	const { isAuthenticated, logout } = useContext(AuthContext);
+	const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
-	const handleAuthClick = () => {
-		if (isAuthenticated) {
-			logout();
-		}
+	const toggleSubmenu = (menuId: string) => {
+		setOpenSubmenu(openSubmenu === menuId ? null : menuId);
 	};
 
 	return (
-		<nav className='w-64 bg-white shadow-md'>
+		<nav className='flex flex-col items-center gap-6 shadow-md bg-primary-color w-80'>
 			<div className='p-4'>
-				<h2 className='text-2xl font-bold text-gray-800'>Admin Dashboard</h2>
+				<img src={Logo} alt='logo' />
 			</div>
-			<ul className='mt-4'>
+			<ul className='w-full space-y-6'>
 				{[
 					{
+						id: 'home',
+						icon: HiOutlineHome,
+						label: 'Home',
+						path: '/',
+					},
+					{
 						id: 'dashboard',
-						icon: FiBarChart2,
+						icon: RxDashboard,
 						label: 'Dashboard',
 						path: '/dashboard',
-					},
-					{ id: 'users', icon: FiUsers, label: 'Users', path: '/users' },
-					{ id: 'posts', icon: FiFileText, label: 'Posts', path: '/posts' },
-					{
-						id: 'analytics',
-						icon: FiBarChart2,
-						label: 'Analytics',
-						path: '/analytics',
+						submenu: [
+							{ label: 'Add User', path: '/users/add' },
+							{ label: 'View Users', path: '/users/view' },
+						],
 					},
 					{
 						id: 'notifications',
@@ -45,36 +49,73 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveTab }) => {
 						path: '/notifications',
 					},
 					{
-						id: 'customization',
+						id: 'profile',
+						icon: LuUser2,
+						label: 'Your Profile',
+						path: '/your-profile',
+						submenu: [
+							{ label: 'Add User', path: '/users/add' },
+							{ label: 'View Users', path: '/users/view' },
+						],
+					},
+					{
+						id: 'setting',
 						icon: FiSettings,
-						label: 'Customization',
-						path: '/customization',
+						label: 'Setting',
+						path: '/setting',
 					},
 					{
 						id: 'auth',
-						icon: isAuthenticated ? FiLogOut : FiLogIn,
-						label: isAuthenticated ? 'Logout' : 'Login',
-						path: isAuthenticated ? '/' : '/login',
+						icon: RiLogoutCircleRLine,
+						label: 'Log out',
+						path: '/logout',
 					},
 				].map((item) => (
-					<li key={item.id}>
+					<li key={item.id} className='w-full px-16'>
 						<NavLink
 							to={item.path}
 							className={({ isActive }) =>
-								`flex items-center w-full p-4 ${
-									isActive ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'
+								`flex items-center justify-between w-full px-6 py-2 rounded-md ${
+									isActive ? 'bg-second-color text-white' : 'text-black hover:text-button-color'
 								}`
 							}
 							onClick={() => {
 								setActiveTab(item.id);
-								if (item.id === 'auth') {
-									handleAuthClick();
+								if (item.submenu) {
+									toggleSubmenu(item.id);
 								}
 							}}
 						>
-							<item.icon className='mr-2' />
-							{item.label}
+							<div className='flex items-center gap-2'>
+								<item.icon />
+								<span className='font-semibold uppercase'>{item.label}</span>
+							</div>
 						</NavLink>
+
+						{item.submenu && (
+							<ul
+								className={`transition-all duration-300 overflow-hidden ${
+									openSubmenu === item.id ? 'max-h-40' : 'max-h-0'
+								}`}
+								style={{ paddingLeft: '1.5rem' }}
+							>
+								{item.submenu.map((subItem, index) => (
+									<li key={index} className='py-2'>
+										<NavLink
+											to={subItem.path}
+											className={({ isActive }) =>
+												`block ${
+													isActive ? 'text-button-color' : 'text-gray-700 hover:text-black'
+												}`
+											}
+											onClick={() => setActiveTab(subItem.label)}
+										>
+											{subItem.label}
+										</NavLink>
+									</li>
+								))}
+							</ul>
+						)}
 					</li>
 				))}
 			</ul>
