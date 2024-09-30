@@ -6,13 +6,17 @@ import { RxDashboard } from 'react-icons/rx';
 import { LuUser2 } from 'react-icons/lu';
 import { RiLogoutCircleRLine } from 'react-icons/ri';
 import Logo from '../../assets/images/logo.png';
+import { Button } from '../ui/button';
+import { X } from 'lucide-react';
 
-interface SidebarProps {
+interface SideBarProps {
+	isSidebarOpen: boolean;
+	toggleSidebar: () => void;
 	activeTab: string;
 	setActiveTab: (tab: string) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ setActiveTab }) => {
+const Sidebar: React.FC<SideBarProps> = ({ setActiveTab, isSidebarOpen, toggleSidebar }) => {
 	const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
 	const toggleSubmenu = (menuId: string) => {
@@ -20,7 +24,14 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveTab }) => {
 	};
 
 	return (
-		<nav className='flex flex-col items-center gap-6 shadow-md bg-primary-color w-80'>
+		<nav
+			className={`fixed lg:static inset-y-0 left-0 transform ${
+				isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+			} lg:translate-x-0 w-64 md:w-80 bg-[#f9f3e3] flex flex-col gap-5 md:gap-10 lg:gap-20 items-center transition-transform duration-300 ease-in-out z-20`}
+		>
+			<Button variant='ghost' size='icon' className='absolute top-4 right-4 lg:hidden' onClick={toggleSidebar}>
+				<X className='w-6 h-6' />
+			</Button>
 			<div className='p-4'>
 				<img src={Logo} alt='logo' />
 			</div>
@@ -71,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setActiveTab }) => {
 						path: '/logout',
 					},
 				].map((item) => (
-					<li key={item.id} className='w-full px-16'>
+					<li key={item.id} className='w-full px-4 md:px-8 lg:px-16'>
 						<NavLink
 							to={item.path}
 							className={({ isActive }) =>

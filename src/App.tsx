@@ -8,15 +8,16 @@ import RootLayout from './layout/RootLayout';
 import Home from './pages/Home';
 import Footer from './components/Footer/Footer';
 
-const Dashboard = React.lazy(() => import('./pages/DashBoard'));
-const UserManagement = React.lazy(() => import('./pages/UserManagement'));
-const Posts = React.lazy(() => import('./pages/Post'));
-const Analytics = React.lazy(() => import('./pages/Analytics'));
-const Notifications = React.lazy(() => import('./pages/Notifications'));
-const Customization = React.lazy(() => import('./pages/Customization'));
+// Import trực tiếp thay vì sử dụng React.lazy
+import Dashboard from './pages/DashBoard';
+import UserManagement from './pages/UserManagement';
+import Posts from './pages/Post';
+import Notifications from './pages/Notifications';
+import Customization from './pages/Customization';
+import Profile from './pages/Profile';
 
 const App: React.FC = () => {
-	const [activeTab, setActiveTab] = useState<string>('/');
+	const [activeTab, setActiveTab] = useState<string>('/dashboard');
 
 	return (
 		<Router>
@@ -81,10 +82,10 @@ const App: React.FC = () => {
 					}
 				/>
 				<Route
-					path='/analytics'
+					path='/your-profile'
 					element={
 						<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-							<Analytics />
+							<Profile />
 						</AdminLayout>
 					}
 				/>
@@ -97,7 +98,7 @@ const App: React.FC = () => {
 					}
 				/>
 				<Route
-					path='/customization'
+					path='/setting'
 					element={
 						<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
 							<Customization />

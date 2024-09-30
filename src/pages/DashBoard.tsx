@@ -1,8 +1,8 @@
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import { RiSearch2Line } from 'react-icons/ri';
 import { RiFilter2Line } from 'react-icons/ri';
+import CardLast from '../components/CardLast/CardLast';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -36,26 +36,11 @@ const Dashboard: React.FC = () => {
 	};
 
 	return (
-		<div className='p-4'>
-			<header className='flex items-center justify-between gap-20 mb-6'>
-				<div className='relative flex items-center flex-1'>
-					<RiSearch2Line className='absolute text-button-color left-3' />
-					<input
-						type='text'
-						placeholder='Search events, users or hosts'
-						className='w-full p-2 pl-10 bg-transparent border rounded-full border-button-color text-button-color placeholder:text-button-color focus:outline-none focus:ring-0'
-					/>
-				</div>
-				<div className='flex items-center'>
-					<div className='mr-4'>
-						<span className='font-semibold'>User Name</span>
-					</div>
-					<img src='https://via.placeholder.com/40' alt='Avatar' className='mr-2 rounded-full' />
-					<button className='px-4 py-2 text-white bg-blue-500 rounded-lg'>Notifications</button>
-				</div>
-			</header>
+		<div className='w-full p-4'>
 			<div className='flex gap-4'>
-				<div className='w-full'>
+				<div className='w-2/3'>
+					<h3 className='text-[#4C4C4C] text-xl font-bold mb-4'>In the last 30 days,</h3>
+					<CardLast />
 					<div className='p-4 bg-white rounded-lg shadow'>
 						<h2 className='mb-4 text-lg font-semibold'>Feedback</h2>
 						<div className='flex items-center justify-between'>
@@ -123,20 +108,6 @@ const Dashboard: React.FC = () => {
 					<h2 className='mb-4 text-lg font-semibold'>Feedback</h2>
 					<div className='flex items-center justify-between'>
 						<Bar data={data} options={options} />
-						<div className='flex flex-col items-end ml-4'>
-							{data.labels.map((label, index) => (
-								<button
-									key={label}
-									className={`w-8 h-8 rounded-full mb-2`}
-									style={{
-										backgroundColor: data.datasets[0].backgroundColor[index],
-										border: '2px solid #000',
-									}}
-								>
-									<span className='sr-only'>{label}</span>
-								</button>
-							))}
-						</div>
 					</div>
 				</div>
 			</div>
