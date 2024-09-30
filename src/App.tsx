@@ -16,7 +16,7 @@ const Notifications = React.lazy(() => import('./pages/Notifications'));
 const Customization = React.lazy(() => import('./pages/Customization'));
 
 const App: React.FC = () => {
-	const [activeTab, setActiveTab] = useState<string>('dashboard');
+	const [activeTab, setActiveTab] = useState<string>('/');
 
 	return (
 		<Router>
