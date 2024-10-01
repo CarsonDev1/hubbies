@@ -1,35 +1,47 @@
 import CardLastImage from '../../assets/images/card-last.png';
 
-const cardData = [
-	{
-		id: 1,
-		count: 120,
-		text: 'Events Created',
-	},
-	{
-		id: 2,
-		count: 400,
-		text: 'Care',
-	},
-	{
-		id: 3,
-		count: 350,
-		text: 'Join',
-	},
-];
-
 const CardLast = () => {
 	return (
-		<div className='grid grid-cols-1 gap-3 mb-4 md:grid-cols-2 xl:grid-cols-3'>
-			{cardData.map((card) => (
-				<div key={card.id} className='relative w-full'>
-					<img src={CardLastImage} alt='card-last' width={227} height={80} className='rounded-md' />
-					<div className='absolute bottom-0 left-0 flex flex-col items-center px-2 pb-2 text-white'>
-						<span className='text-xl font-bold md:text-2xl lg:text-4xl'>{card.count}</span>
-						<span className='text-xs'>{card.text}</span>
-					</div>
+		<div className='grid grid-cols-1 gap-4 mb-6 md:grid-cols-3'>
+			<div className='bg-[#98971a] text-white p-4 rounded-lg relative w-full overflow-hidden'>
+				<img
+					src={CardLastImage}
+					alt='cart-last'
+					width={800}
+					height={500}
+					className='absolute top-0 left-0 z-0 object-cover w-full h-full rounded-md'
+				/>
+				<div className='relative z-10'>
+					<h2 className='text-4xl font-bold'>120</h2>
+					<p>Event created</p>
 				</div>
-			))}
+			</div>
+			<div className='bg-[#98971a] text-white p-4 rounded-lg relative w-full overflow-hidden'>
+				<img
+					src={CardLastImage}
+					alt='cart-last'
+					width={800}
+					height={500}
+					className='absolute top-0 left-0 z-0 object-cover w-full h-full rounded-md'
+				/>
+				<div className='relative z-10'>
+					<h2 className='text-4xl font-bold'>400</h2>
+					<p>Care</p>
+				</div>
+			</div>
+			<div className='bg-[#98971a] text-white p-4 rounded-lg relative w-full overflow-hidden'>
+				<img
+					src={CardLastImage}
+					alt='cart-last'
+					width={800}
+					height={500}
+					className='absolute top-0 left-0 z-0 object-cover w-full h-full rounded-md'
+				/>
+				<div className='relative z-10'>
+					<h2 className='text-4xl font-bold'>350</h2>
+					<p>Join</p>
+				</div>
+			</div>
 		</div>
 	);
 };
