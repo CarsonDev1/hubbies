@@ -12,8 +12,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 	return (
-		<header>
-			<div className='flex items-center justify-between mb-4 lg:hidden'>
+		<header className='fixed lg:relative top-0 left-0 w-full shadow-md lg:shadow-none z-10 bg-[#FFFEE5] lg:bg-transparent'>
+			<div className='flex items-center justify-between py-2 lg:hidden'>
 				<Button variant='ghost' size='icon' onClick={toggleSidebar}>
 					<Menu className='w-6 h-6' />
 				</Button>
@@ -25,7 +25,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 
 			<div className='items-center justify-between hidden mb-6 lg:flex'>
 				<div className='relative flex-1 w-2/3'>
-					<RiSearch2Line className='absolute w-6 h-7 transform -translate-y-1/2 text-[#D1B186] left-3 top-1/2' />
+					<RiSearch2Line className='absolute w-6 h-7 transform -translate-y-1/2 text-[#D1B186] left-3 top-1/2 hidden xl:block' />
 					<input
 						type='text'
 						placeholder='Search events, users or hosts'

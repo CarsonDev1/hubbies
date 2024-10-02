@@ -8,7 +8,6 @@ import RootLayout from './layout/RootLayout';
 import Home from './pages/Home';
 import Footer from './components/Footer/Footer';
 
-// Import trực tiếp thay vì sử dụng React.lazy
 import Dashboard from './pages/DashBoard';
 import UserManagement from './pages/UserManagement';
 import Posts from './pages/Post';

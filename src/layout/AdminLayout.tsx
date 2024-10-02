@@ -24,14 +24,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, setActiv
 				activeTab={activeTab}
 				setActiveTab={setActiveTab}
 			/>
-			<main className='flex-1 p-4 overflow-y-auto md:p-6 lg:p-12'>
+			<main className='flex-1 p-2 overflow-y-auto lg:p-'>
 				{activeTab === 'profile' ? (
 					<ProfileHeader toggleSidebar={toggleSidebar} />
 				) : (
 					<Header toggleSidebar={toggleSidebar} />
 				)}
 
-				<div className='mx-auto'>
+				<div className='mx-auto pt-14'>
 					{children}
 					<ToastContainer />
 				</div>

@@ -27,7 +27,7 @@ const Sidebar: React.FC<SideBarProps> = ({ setActiveTab, isSidebarOpen, toggleSi
 		<nav
 			className={`fixed lg:static inset-y-0 left-0 transform ${
 				isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-			} lg:translate-x-0 w-64 md:w-80 bg-[#f9f3e3] flex flex-col gap-5 md:gap-10 lg:gap-20 items-center transition-transform duration-300 ease-in-out z-20`}
+			} lg:translate-x-0 w-64 2xl:w-80 bg-[#f9f3e3] flex flex-col gap-5 md:gap-10 lg:gap-20 items-center transition-transform duration-300 ease-in-out z-20`}
 		>
 			<Button variant='ghost' size='icon' className='absolute top-4 right-4 lg:hidden' onClick={toggleSidebar}>
 				<X className='w-6 h-6' />
@@ -82,7 +82,7 @@ const Sidebar: React.FC<SideBarProps> = ({ setActiveTab, isSidebarOpen, toggleSi
 						path: '/logout',
 					},
 				].map((item) => (
-					<li key={item.id} className='w-full px-4 md:px-8 lg:px-16'>
+					<li key={item.id} className='w-full px-4 md:px-8 2xl:px-16'>
 						<NavLink
 							to={item.path}
 							className={({ isActive }) =>
@@ -99,7 +99,7 @@ const Sidebar: React.FC<SideBarProps> = ({ setActiveTab, isSidebarOpen, toggleSi
 						>
 							<div className='flex items-center gap-2'>
 								<item.icon />
-								<span className='font-semibold uppercase'>{item.label}</span>
+								<span className='font-semibold uppercase inline-flex'>{item.label}</span>
 							</div>
 						</NavLink>
 

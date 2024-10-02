@@ -2,7 +2,7 @@ import CardLastImage from '../../assets/images/card-last.png';
 
 const CardLast = () => {
 	return (
-		<div className='grid grid-cols-1 gap-4 mb-6 md:grid-cols-3'>
+		<div className='grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 md:grid-cols-3'>
 			<div className='bg-[#98971a] text-white p-4 rounded-lg relative w-full overflow-hidden'>
 				<img
 					src={CardLastImage}
