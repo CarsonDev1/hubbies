@@ -4,6 +4,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import CardLast from '../components/CardLast/CardLast';
 import { Filter } from 'lucide-react';
 import { FiSearch } from 'react-icons/fi';
+import FamousCard from '../components/FamousCard/FamousCard';
+import Clock from '../components/Clock/Clock';
 
 const data = [
 	{ name: 'XS', totalFeedback: 70, totalParticipants: 70, totalViews: 70 },
@@ -52,9 +54,9 @@ const Dashboard: React.FC = () => {
 					<h3 className='text-[#4C4C4C] text-xl font-bold mb-4'>In the last 30 days,</h3>
 					<CardLast />
 					<section>
-						<div className='flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8 gap-2 md:gap-0'>
-							<div className='flex flex-col items-center md:items-start gap-1'>
-								<h2 className='text-xl md:text-4xl font-bold'>All Events</h2>
+						<div className='flex flex-col items-center justify-between gap-2 mb-4 md:flex-row md:mb-8 md:gap-0'>
+							<div className='flex flex-col items-center gap-1 md:items-start'>
+								<h2 className='text-xl font-bold md:text-4xl'>All Events</h2>
 								<span className='text-sm md:text-base'>Monitor event informations, tags, etc.</span>
 							</div>
 							<div className='flex items-center gap-4'>
@@ -122,9 +124,9 @@ const Dashboard: React.FC = () => {
 					</section>
 
 					<section>
-						<div className='flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8 gap-2 md:gap-0'>
-							<div className='flex flex-col items-center md:items-start gap-1'>
-								<h2 className='text-xl md:text-4xl font-bold'>All Events</h2>
+						<div className='flex flex-col items-center justify-between gap-2 mb-4 md:flex-row md:mb-8 md:gap-0'>
+							<div className='flex flex-col items-center gap-1 md:items-start'>
+								<h2 className='text-xl font-bold md:text-4xl'>All Events</h2>
 								<span className='text-sm md:text-base'>Monitor event informations, tags, etc.</span>
 							</div>
 							<div className='flex items-center gap-4'>
@@ -184,9 +186,9 @@ const Dashboard: React.FC = () => {
 					</section>
 
 					<section>
-						<div className='flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8 gap-2 md:gap-0'>
-							<div className='flex flex-col items-center md:items-start gap-1'>
-								<h2 className='text-xl md:text-4xl font-bold'>All Events</h2>
+						<div className='flex flex-col items-center justify-between gap-2 mb-4 md:flex-row md:mb-8 md:gap-0'>
+							<div className='flex flex-col items-center gap-1 md:items-start'>
+								<h2 className='text-xl font-bold md:text-4xl'>All Events</h2>
 								<span className='text-sm md:text-base'>Monitor event informations, tags, etc.</span>
 							</div>
 							<div className='flex items-center gap-4'>
@@ -250,9 +252,9 @@ const Dashboard: React.FC = () => {
 					</section>
 
 					<section>
-						<div className='flex flex-col md:flex-row items-center justify-between mb-4 md:mb-8 gap-2 md:gap-0'>
-							<div className='flex flex-col items-center md:items-start gap-1'>
-								<h2 className='text-xl md:text-4xl font-bold'>All Events</h2>
+						<div className='flex flex-col items-center justify-between gap-2 mb-4 md:flex-row md:mb-8 md:gap-0'>
+							<div className='flex flex-col items-center gap-1 md:items-start'>
+								<h2 className='text-xl font-bold md:text-4xl'>All Events</h2>
 								<span className='text-sm md:text-base'>Monitor event informations, tags, etc.</span>
 							</div>
 							<div className='flex items-center gap-4'>
@@ -315,7 +317,7 @@ const Dashboard: React.FC = () => {
 						</div>
 					</section>
 				</div>
-				<div className='space-y-6 xl:w-1/4'>
+				<div className='space-y-6 xl:w-1/3'>
 					<section>
 						<div className='w-full p-4 bg-[#fdf6e3] rounded-lg shadow'>
 							<h2 className='text-lg font-semibold mb-4 text-[#3c3c3c]'>
@@ -360,36 +362,8 @@ const Dashboard: React.FC = () => {
 							</ResponsiveContainer>
 						</div>
 					</section>
-
-					<section>
-						<h2 className='mb-4 text-2xl font-bold'>Most famous event</h2>
-						<div className='space-y-2'>
-							<div className='flex items-center bg-[#f2e5bc] p-2 rounded-lg'>
-								<div className='w-10 h-10 mr-4 bg-purple-500 rounded-full'></div>
-								<div>
-									<p className='font-semibold'>Flotsam</p>
-									<p className='text-sm'>400+ participants 400+ views</p>
-								</div>
-							</div>
-							<div className='flex items-center bg-[#f2e5bc] p-2 rounded-lg'>
-								<div className='w-10 h-10 mr-4 bg-blue-500 rounded-full'></div>
-								<div>
-									<p className='font-semibold'>Astrom</p>
-									<p className='text-sm'>420+ participants 404+ views</p>
-								</div>
-							</div>
-							<div className='flex items-center bg-[#f2e5bc] p-2 rounded-lg'>
-								<div className='w-10 h-10 mr-4 bg-gray-500 rounded-full'></div>
-								<div>
-									<p className='font-semibold'>Shoom</p>
-									<p className='text-sm'>450+ participants 540+ views</p>
-								</div>
-							</div>
-						</div>
-						<button className='w-full bg-[#d65d0e] text-white py-2 px-4 rounded-lg mt-4'>
-							View all events
-						</button>
-					</section>
+					<FamousCard />
+					<Clock />
 				</div>
 			</div>
 		</div>

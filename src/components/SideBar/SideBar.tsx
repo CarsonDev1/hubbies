@@ -86,7 +86,7 @@ const Sidebar: React.FC<SideBarProps> = ({ setActiveTab, isSidebarOpen, toggleSi
 						<NavLink
 							to={item.path}
 							className={({ isActive }) =>
-								`flex items-center justify-between w-full px-6 py-2 rounded-md ${
+								`flex items-center justify-between w-full p-2 rounded-md ${
 									isActive ? 'bg-second-color text-white' : 'text-black hover:text-button-color'
 								}`
 							}
@@ -98,8 +98,8 @@ const Sidebar: React.FC<SideBarProps> = ({ setActiveTab, isSidebarOpen, toggleSi
 							}}
 						>
 							<div className='flex items-center gap-2'>
-								<item.icon />
-								<span className='font-semibold uppercase inline-flex'>{item.label}</span>
+								<item.icon className='size-6' />
+								<span className='inline-flex font-semibold uppercase'>{item.label}</span>
 							</div>
 						</NavLink>
 

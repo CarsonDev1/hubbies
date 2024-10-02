@@ -14,6 +14,7 @@ import Posts from './pages/Post';
 import Notifications from './pages/Notifications';
 import Customization from './pages/Customization';
 import Profile from './pages/Profile';
+import LandingPage from './pages/LandingPage';
 
 const App: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<string>('/dashboard');
@@ -21,6 +22,7 @@ const App: React.FC = () => {
 	return (
 		<Router>
 			<Routes>
+				<Route path='/landing-page' element={<LandingPage />} />
 				<Route
 					path='/login'
 					element={
