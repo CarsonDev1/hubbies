@@ -15,6 +15,7 @@ import Notifications from './pages/Notifications';
 import Customization from './pages/Customization';
 import Profile from './pages/Profile';
 import LandingPage from './pages/LandingPage';
+import Cart from './pages/Cart';
 
 const App: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<string>('/dashboard');
@@ -45,6 +46,17 @@ const App: React.FC = () => {
 						<>
 							<RootLayout activeTab={activeTab} setActiveTab={setActiveTab}>
 								<Home />
+							</RootLayout>
+							<Footer />
+						</>
+					}
+				/>
+				<Route
+					path='/cart'
+					element={
+						<>
+							<RootLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+								<Cart />
 							</RootLayout>
 							<Footer />
 						</>
