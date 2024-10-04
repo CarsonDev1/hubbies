@@ -20,7 +20,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, activeTab, setActiveT
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
 	return (
-		<div className='flex h-screen bg-gray-100'>
+		<div className='flex h-full bg-gray-100'>
 			<SideBarRoot
 				isSidebarOpen={isSidebarOpen}
 				toggleSidebar={toggleSidebar}
