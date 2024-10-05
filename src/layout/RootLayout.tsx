@@ -27,7 +27,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, activeTab, setActiveT
 				activeTab={activeTab}
 				setActiveTab={setActiveTab}
 			/>
-			<main className='flex-1 p-2 md:p-4 lg:p-8 h-full bg-[#f9f3e3]'>
+			<main className='flex-1 w-full overflow-hidden p-2 md:p-4 lg:p-8 h-full bg-[#f9f3e3]'>
 				<div className='flex items-center justify-between mb-4 lg:hidden'>
 					<Button variant='ghost' size='icon' onClick={toggleSidebar}>
 						<Menu className='w-6 h-6' />
