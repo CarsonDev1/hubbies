@@ -11,7 +11,7 @@ import { IoPaperPlaneOutline } from 'react-icons/io5';
 
 const Home = () => {
 	const [selectedDate, setSelectedDate] = useState(18);
-	const [highlightedDate, setHighlightedDate] = useState(12);
+	const [highlightedDate] = useState(12);
 
 	const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 	const dates = Array.from({ length: 31 }, (_, i) => i + 1);
