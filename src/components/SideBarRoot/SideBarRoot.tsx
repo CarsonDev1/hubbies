@@ -24,7 +24,7 @@ const SideBarRoot: React.FC<SideBarRootProps> = ({ isSidebarOpen, toggleSidebar 
 				<img src={Logo} alt='Logo' width={118} height={61} />
 			</div>
 			<nav className='space-y-6'>
-				{['DISCOVERY', 'FEATURES', 'TIMELINE', 'PROFILE', 'SETTING'].map((item) => (
+				{['HOME', 'DISCOVERY', 'FEATURES', 'PROFILE'].map((item) => (
 					<Button
 						key={item}
 						variant='ghost'
