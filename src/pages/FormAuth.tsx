@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import Logo from '../assets/images/logo.png';
 import FormImage from '../assets/images/form-image.png';
+import axiosInstance from '../utils/axiosIntance';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { LoginBody, LoginBodyType, RegisterBody, RegisterBodyType } from '../schemaValidations/auth.schema';
+import { toast } from 'react-toastify';
 
 const FormAuth: React.FC = () => {
 	const navigate = useNavigate();
@@ -10,6 +15,7 @@ const FormAuth: React.FC = () => {
 	const [isLogin, setIsLogin] = useState(location.pathname === '/login');
 	const [showPassword, setShowPassword] = useState(false);
 	const [rememberMe, setRememberMe] = useState(false);
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		setIsLogin(location.pathname === '/login');
@@ -21,6 +27,46 @@ const FormAuth: React.FC = () => {
 
 	const handleRememberMeChange = () => {
 		setRememberMe(!rememberMe);
+	};
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<RegisterBodyType | LoginBodyType>({
+		resolver: zodResolver(isLogin ? LoginBody : RegisterBody),
+		defaultValues: {
+			email: '',
+			password: '',
+		},
+	});
+
+	const onSubmit = async (data: RegisterBodyType | LoginBodyType) => {
+		setLoading(true);
+
+		try {
+			if (!isLogin) {
+				const response = await axiosInstance.post('/auths/event-host/register', data);
+				if (response.status === 200) {
+					navigate('/login');
+					toast.success('Registration successful!');
+				}
+			} else {
+				const response = await axiosInstance.post('/auths/login', data);
+				if (response.status === 200) {
+					navigate('/dashboard');
+					toast.success('Login successful!');
+				}
+			}
+		} catch (error: any) {
+			if (error.response?.status === 409) {
+				toast.error('Email is already registered. Please try another email.');
+			} else {
+				toast.error(error.response?.data?.message || (isLogin ? 'Login failed.' : 'Registration failed.'));
+			}
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -63,35 +109,24 @@ const FormAuth: React.FC = () => {
 					</div>
 
 					<form
-						onSubmit={() => {}}
+						onSubmit={handleSubmit(onSubmit)}
 						className='w-full px-3 mx-auto space-y-4 lg:space-y-6 md:w-2/3 lg:w-3/4'
 						autoComplete='off'
 					>
-						{!isLogin && (
-							<div>
-								<label htmlFor='email' className='block mb-2 text-sm font-semibold text-button-color'>
-									Email address
-								</label>
-								<input
-									id='email'
-									type='email'
-									className='w-full px-4 py-3 bg-white border rounded-full lg:bg-transparent border-button-color focus:outline-none focus:ring-0'
-									placeholder='Enter your email'
-									autoComplete='off'
-								/>
-							</div>
-						)}
-
 						<div>
-							<label htmlFor='username' className='block mb-2 text-sm font-semibold text-button-color'>
-								Username
+							<label htmlFor='email' className='block mb-2 text-sm font-semibold text-button-color'>
+								Email address
 							</label>
 							<input
-								id='username'
-								type='text'
-								className='w-full px-4 py-3 bg-white border rounded-full lg:bg-transparent border-button-color focus:outline-none focus:ring-0'
-								placeholder='Enter your User name'
+								id='email'
+								type='email'
+								{...register('email')}
+								className={`w-full px-4 py-3 bg-white border rounded-full lg:bg-transparent border-button-color focus:outline-none focus:ring-0 ${
+									errors.email ? 'border-red-500' : ''
+								}`}
+								placeholder='Enter your email'
 							/>
+							{errors.email && <p className='text-red-500 text-xs'>{errors.email.message}</p>}
 						</div>
 
 						<div className='relative'>
@@ -101,10 +136,12 @@ const FormAuth: React.FC = () => {
 							<input
 								id='password'
 								type={showPassword ? 'text' : 'password'}
-								className='w-full px-4 py-3 bg-white border rounded-full lg:bg-transparent border-button-color focus:outline-none focus:ring-0'
+								{...register('password')}
+								className={`w-full px-4 py-3 bg-white border rounded-full lg:bg-transparent border-button-color focus:outline-none focus:ring-0 ${
+									errors.password ? 'border-red-500' : ''
+								}`}
 								placeholder='Enter your Password'
 							/>
-
 							<div
 								className='absolute flex items-center px-3 text-gray-600 cursor-pointer right-3 top-[55%]'
 								onClick={togglePasswordVisibility}
@@ -115,6 +152,7 @@ const FormAuth: React.FC = () => {
 									<IoMdEye className='text-button-color' />
 								)}
 							</div>
+							{errors.password && <p className='text-red-500 text-xs'>{errors.password.message}</p>}
 						</div>
 
 						{isLogin && (
@@ -171,9 +209,18 @@ const FormAuth: React.FC = () => {
 						<div className='flex justify-center lg:justify-end'>
 							<button
 								type='submit'
+								disabled={loading}
 								className='flex justify-center w-1/2 px-4 py-3 text-sm font-medium text-white transition-all duration-500 ease-in-out rounded-full bg-button-color hover:bg-orange-500'
 							>
-								{isLogin ? 'Sign In' : 'Register'}
+								{loading ? (
+									<div className='loader w-full h-full'>
+										<div className='spinner-border animate-spin inline-block w-4 h-4 border-4 rounded-full'></div>
+									</div>
+								) : isLogin ? (
+									'Sign In'
+								) : (
+									'Register'
+								)}
 							</button>
 						</div>
 					</form>
