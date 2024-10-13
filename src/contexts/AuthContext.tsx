@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import LoadingSpinner from '../components/Loading/LoadingSpinner';
 
+// Định nghĩa interface cho AuthContext
 interface AuthContextType {
 	isAuthenticated: boolean;
 	token: string | null;
@@ -22,12 +24,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 	const [token, setToken] = useState<string | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 
-	useEffect(() => {
+	const checkToken = () => {
 		const storedToken = localStorage.getItem('token');
-
 		if (storedToken) {
 			axios
-				.get('http://localhost:5000/api/auth/me', {
+				.get('https://hubbies-be.azurewebsites.net/api/accounts', {
 					headers: {
 						Authorization: `Bearer ${storedToken}`,
 					},
@@ -37,35 +38,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 						setIsAuthenticated(true);
 						setToken(storedToken);
 					} else {
-						setIsAuthenticated(true);
+						setIsAuthenticated(false);
 					}
 				})
 				.catch(() => {
-					setIsAuthenticated(true);
+					setIsAuthenticated(false);
 				})
 				.finally(() => {
 					setLoading(false);
 				});
 		} else {
 			setLoading(false);
+			setIsAuthenticated(false);
 		}
+	};
+
+	useEffect(() => {
+		checkToken();
+	}, []);
+
+	useEffect(() => {
+		const handleStorageChange = () => {
+			checkToken();
+		};
+
+		window.addEventListener('storage', handleStorageChange);
+
+		return () => {
+			window.removeEventListener('storage', handleStorageChange);
+		};
 	}, []);
 
 	const login = (newToken: string) => {
 		setToken(newToken);
 		setIsAuthenticated(true);
 		localStorage.setItem('token', newToken);
+		checkToken();
 	};
 
 	const logout = () => {
 		setToken(null);
 		setIsAuthenticated(false);
 		localStorage.removeItem('token');
+		checkToken();
 	};
 
 	return (
 		<AuthContext.Provider value={{ isAuthenticated, token, login, logout, loading }}>
-			{loading ? <div>Loading...</div> : children}
+			{loading ? <LoadingSpinner /> : children}
 		</AuthContext.Provider>
 	);
 };

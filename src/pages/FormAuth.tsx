@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
@@ -46,7 +47,7 @@ const FormAuth: React.FC = () => {
 
 		try {
 			if (!isLogin) {
-				const response = await axiosInstance.post('/auths/event-host/register', data);
+				const response = await axiosInstance.post('/auths/register', data);
 				if (response.status === 200) {
 					navigate('/login');
 					toast.success('Registration successful!');
@@ -54,7 +55,8 @@ const FormAuth: React.FC = () => {
 			} else {
 				const response = await axiosInstance.post('/auths/login', data);
 				if (response.status === 200) {
-					navigate('/dashboard');
+					localStorage.setItem('token', response.data.accessToken);
+					navigate('/');
 					toast.success('Login successful!');
 				}
 			}
@@ -126,7 +128,7 @@ const FormAuth: React.FC = () => {
 								}`}
 								placeholder='Enter your email'
 							/>
-							{errors.email && <p className='text-red-500 text-xs'>{errors.email.message}</p>}
+							{errors.email && <p className='text-xs text-red-500'>{errors.email.message}</p>}
 						</div>
 
 						<div className='relative'>
@@ -152,7 +154,7 @@ const FormAuth: React.FC = () => {
 									<IoMdEye className='text-button-color' />
 								)}
 							</div>
-							{errors.password && <p className='text-red-500 text-xs'>{errors.password.message}</p>}
+							{errors.password && <p className='text-xs text-red-500'>{errors.password.message}</p>}
 						</div>
 
 						{isLogin && (
@@ -213,9 +215,7 @@ const FormAuth: React.FC = () => {
 								className='flex justify-center w-1/2 px-4 py-3 text-sm font-medium text-white transition-all duration-500 ease-in-out rounded-full bg-button-color hover:bg-orange-500'
 							>
 								{loading ? (
-									<div className='loader w-full h-full'>
-										<div className='spinner-border animate-spin inline-block w-4 h-4 border-4 rounded-full'></div>
-									</div>
+									<div className='w-4 h-4 border-b-2 border-white rounded-full animate-spin'></div>
 								) : isLogin ? (
 									'Sign In'
 								) : (
@@ -223,6 +223,18 @@ const FormAuth: React.FC = () => {
 								)}
 							</button>
 						</div>
+
+						{!isLogin && (
+							<div className='flex justify-center mt-4'>
+								<button
+									type='button'
+									className='text-sm font-semibold text-button-color hover:text-orange-500'
+									onClick={() => navigate('/register-eventhost')}
+								>
+									You can register as EventHost?
+								</button>
+							</div>
+						)}
 					</form>
 				</div>
 			</div>

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import LoginLayout from './layout/LoginLayout';
 import AdminLayout from './layout/AdminLayout';
 import FormAuth from './pages/FormAuth';
@@ -16,6 +16,20 @@ import Customization from './pages/Customization';
 import Profile from './pages/Profile';
 import LandingPage from './pages/LandingPage';
 import Cart from './pages/Cart';
+import EventHostRegister from './pages/EventHostRegister';
+
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+	const navigate = useNavigate();
+	const isAuthenticated = !!localStorage.getItem('token');
+
+	useEffect(() => {
+		if (!isAuthenticated) {
+			navigate('/landing-page');
+		}
+	}, [isAuthenticated, navigate]);
+
+	return <>{isAuthenticated ? children : null}</>;
+};
 
 const App: React.FC = () => {
 	const [activeTab, setActiveTab] = useState<string>('/dashboard');
@@ -41,33 +55,48 @@ const App: React.FC = () => {
 					}
 				/>
 				<Route
+					path='/register-eventhost'
+					element={
+						<LoginLayout>
+							<EventHostRegister />
+						</LoginLayout>
+					}
+				/>
+				<Route
 					path='/'
 					element={
-						<>
-							<RootLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-								<Home />
-							</RootLayout>
-							<Footer />
-						</>
+						<ProtectedRoute>
+							<>
+								<RootLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+									<Home />
+								</RootLayout>
+								<Footer />
+							</>
+						</ProtectedRoute>
 					}
 				/>
 				<Route
 					path='/cart'
 					element={
-						<>
-							<RootLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-								<Cart />
-							</RootLayout>
-							<Footer />
-						</>
+						<ProtectedRoute>
+							<>
+								<RootLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+									<Cart />
+								</RootLayout>
+								<Footer />
+							</>
+						</ProtectedRoute>
 					}
 				/>
+				{/* Protected Routes */}
 				<Route
 					path='/dashboard'
 					element={
-						<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-							<Dashboard />
-						</AdminLayout>
+						<ProtectedRoute>
+							<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+								<Dashboard />
+							</AdminLayout>
+						</ProtectedRoute>
 					}
 				/>
 				<Route
@@ -81,41 +110,51 @@ const App: React.FC = () => {
 				<Route
 					path='/users'
 					element={
-						<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-							<UserManagement />
-						</AdminLayout>
+						<ProtectedRoute>
+							<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+								<UserManagement />
+							</AdminLayout>
+						</ProtectedRoute>
 					}
 				/>
 				<Route
 					path='/posts'
 					element={
-						<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-							<Posts />
-						</AdminLayout>
+						<ProtectedRoute>
+							<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+								<Posts />
+							</AdminLayout>
+						</ProtectedRoute>
 					}
 				/>
 				<Route
 					path='/your-profile'
 					element={
-						<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-							<Profile />
-						</AdminLayout>
+						<ProtectedRoute>
+							<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+								<Profile />
+							</AdminLayout>
+						</ProtectedRoute>
 					}
 				/>
 				<Route
 					path='/notifications'
 					element={
-						<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-							<Notifications />
-						</AdminLayout>
+						<ProtectedRoute>
+							<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+								<Notifications />
+							</AdminLayout>
+						</ProtectedRoute>
 					}
 				/>
 				<Route
 					path='/setting'
 					element={
-						<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-							<Customization />
-						</AdminLayout>
+						<ProtectedRoute>
+							<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+								<Customization />
+							</AdminLayout>
+						</ProtectedRoute>
 					}
 				/>
 			</Routes>
