@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginBody, LoginBodyType, RegisterBody, RegisterBodyType } from '../schemaValidations/auth.schema';
 import { toast } from 'react-toastify';
+import { jwtDecode } from 'jwt-decode';
 
 const FormAuth: React.FC = () => {
 	const navigate = useNavigate();
@@ -56,7 +57,13 @@ const FormAuth: React.FC = () => {
 				const response = await axiosInstance.post('/auths/login', data);
 				if (response.status === 200) {
 					localStorage.setItem('token', response.data.accessToken);
-					navigate('/');
+					const { accessToken } = response.data;
+					const decoded: any = jwtDecode(accessToken);
+					if (decoded?.role === 'EventHost') {
+						navigate('/');
+					} else {
+						navigate('/dashboard');
+					}
 					toast.success('Login successful!');
 					window.location.reload();
 				}
@@ -230,7 +237,7 @@ const FormAuth: React.FC = () => {
 								<button
 									type='button'
 									className='text-sm font-semibold text-button-color hover:text-orange-500'
-									onClick={() => navigate('/register-eventhost')}
+									onClick={() => navigate('/register?role=Eventhost')}
 								>
 									You can register as EventHost?
 								</button>

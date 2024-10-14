@@ -28,7 +28,6 @@ type FormData = {
 	description: string;
 };
 
-// Define validation schema using Zod
 const schema = z.object({
 	photo: z.instanceof(File).nullable().optional(),
 	host: z.string().nonempty({ message: 'Host name is required' }),
@@ -76,9 +75,9 @@ const TicketPost: React.FC = () => {
 				quantity: 50,
 				price: data.price,
 				address: data.place,
-				postDate: data.date + 'T' + data.time + ':00.000Z', // Ensure the date and time are properly formatted
-				image: 'https://monke-cofi.com/image.jpg', // Replace with actual image URL if needed
-				eventCategoryId: '3fa85f64-5717-4562-b3fc-2c963f66afa6', // You should replace this with the correct ID
+				postDate: data.date + 'T' + data.time + ':00.000Z',
+				image: 'https://monke-cofi.com/image.jpg',
+				eventCategoryId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
 			};
 
 			const response = await fetch('https://hubbies-be.azurewebsites.net/api/ticket-events', {
@@ -135,13 +134,13 @@ const TicketPost: React.FC = () => {
 
 	return (
 		<div className='p-4'>
-			<div className='flex justify-between items-center mb-4'>
+			<div className='flex items-center justify-between mb-4'>
 				<h2 className='text-xl font-bold'>Event Details</h2>
 				<Dialog open={isOpen} onOpenChange={setIsOpen}>
 					<DialogTrigger asChild>
 						<Button className='bg-[#FFA500] hover:bg-[#FF8C00] text-white'>Add Ticket</Button>
 					</DialogTrigger>
-					<DialogContent className='sm:max-w-3xl bg-[#FFF8E7] border-[#D2B48C]'>
+					<DialogContent className='sm:max-w-3xl max-h-[90vh] overflow-y-auto bg-[#FFF8E7] border-[#D2B48C]'>
 						<DialogHeader>
 							<DialogTitle className='text-[#8B4513]'>Add New Ticket</DialogTitle>
 							<DialogDescription className='text-[#A0522D]'>

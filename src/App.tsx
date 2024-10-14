@@ -18,6 +18,8 @@ import LandingPage from './pages/LandingPage';
 import Cart from './pages/Cart';
 import EventHostRegister from './pages/EventHostRegister';
 import TicketPost from './pages/TicketPost';
+import CategoryEvent from './pages/CategoryEvent';
+import FeedBack from './pages/FeedBack';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const navigate = useNavigate();
@@ -56,7 +58,7 @@ const App: React.FC = () => {
 					}
 				/>
 				<Route
-					path='/register-eventhost'
+					path='/register?role=Eventhost'
 					element={
 						<LoginLayout>
 							<EventHostRegister />
@@ -64,7 +66,7 @@ const App: React.FC = () => {
 					}
 				/>
 				<Route
-					path='/login-eventhost'
+					path='/login?role=Eventhost'
 					element={
 						<LoginLayout>
 							<EventHostRegister />
@@ -104,6 +106,32 @@ const App: React.FC = () => {
 							<>
 								<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
 									<TicketPost />
+								</AdminLayout>
+								<Footer />
+							</>
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path='/category'
+					element={
+						<ProtectedRoute>
+							<>
+								<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+									<CategoryEvent />
+								</AdminLayout>
+								<Footer />
+							</>
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path='/feedback'
+					element={
+						<ProtectedRoute>
+							<>
+								<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+									<FeedBack />
 								</AdminLayout>
 								<Footer />
 							</>

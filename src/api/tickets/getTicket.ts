@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export async function getAllCategory() {
 	try {
-		const baseUrl = ``;
+		const baseUrl = 'https://hubbies-be.azurewebsites.net/api/event-categories';
 
 		const response = await axios.get(baseUrl, {
 			headers: {
