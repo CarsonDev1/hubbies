@@ -1,19 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { RegisterBody, RegisterBodyType } from '../schemaValidations/auth.schema';
+import { LoginBody, LoginBodyType, RegisterBody, RegisterBodyType } from '../schemaValidations/auth.schema';
 import { toast } from 'react-toastify';
 import { IoMdEye, IoMdEyeOff } from 'react-icons/io';
 import Logo from '../assets/images/logo.png';
 import FormImage from '../assets/images/form-image.png';
 import axiosInstance from '../utils/axiosIntance';
 
-const EventHostRegister: React.FC = () => {
+const EventHostAuth: React.FC = () => {
 	const navigate = useNavigate();
+	const location = useLocation();
+	const [isLogin, setIsLogin] = useState(location.pathname === '/login-eventhost');
 	const [showPassword, setShowPassword] = useState(false);
 	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		setIsLogin(location.pathname === '/login-eventhost');
+	}, [location]);
 
 	const togglePasswordVisibility = () => {
 		setShowPassword((prev) => !prev);
@@ -23,25 +29,37 @@ const EventHostRegister: React.FC = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<RegisterBodyType>({
-		resolver: zodResolver(RegisterBody),
+	} = useForm<RegisterBodyType | LoginBodyType>({
+		resolver: zodResolver(isLogin ? LoginBody : RegisterBody),
 		defaultValues: {
 			email: '',
 			password: '',
 		},
 	});
 
-	const onSubmit = async (data: RegisterBodyType) => {
+	const onSubmit = async (data: RegisterBodyType | LoginBodyType) => {
 		setLoading(true);
 
 		try {
-			const response = await axiosInstance.post('/auths/register?role=EventHost', data);
-			if (response.status === 200) {
-				navigate('/login');
-				toast.success('EventHost registration successful!');
+			if (!isLogin) {
+				const response = await axiosInstance.post('/auths/register?role=EventHost', data);
+				if (response.status === 200) {
+					navigate('/login-eventhost');
+					toast.success('EventHost registration successful!');
+				}
+			} else {
+				const response = await axiosInstance.post('/auths/login', data);
+				if (response.status === 200) {
+					localStorage.setItem('token', response.data.accessToken);
+					navigate('/dashboard');
+					toast.success('Login successful!');
+					window.location.reload();
+				}
 			}
 		} catch (error: any) {
-			toast.error(error.response?.data?.message || 'EventHost registration failed.');
+			toast.error(
+				error.response?.data?.message || (isLogin ? 'Login failed.' : 'EventHost registration failed.')
+			);
 		} finally {
 			setLoading(false);
 		}
@@ -54,8 +72,36 @@ const EventHostRegister: React.FC = () => {
 				<div className='flex flex-col'>
 					<div className='text-center'>
 						<h2 className='text-2xl md:text-3xl lg:text-4xl 2xl:text-6xl font-semibold text-white lg:text-[#000]'>
-							Register as <br className='hidden lg:block' /> EventHost
+							{isLogin ? 'Login as EventHost' : 'Register as EventHost'}
 						</h2>
+					</div>
+
+					<div className='relative flex w-3/4 p-2 mx-auto mt-2 mb-2 border rounded-full sm:w-2/3 md:w-2/4 md:mt-4 md:mb-4 lg:mb-8 2xl:mb-12 bg-primary-color border-button-color'>
+						<div className='relative flex w-full'>
+							<div
+								className={`absolute top-0 bottom-0 left-0 w-1/2 h-full bg-button-color rounded-full transition-transform duration-300 ease-in-out ${
+									!isLogin ? 'transform translate-x-full' : ''
+								}`}
+							></div>
+
+							<button
+								onClick={() => navigate('/login-eventhost')}
+								className={`w-1/2 py-1 xl:py-3 text-center text-base font-normal relative z-10 transition-all duration-300 ease-in-out ${
+									isLogin ? 'text-white' : 'text-button-color'
+								}`}
+							>
+								Login
+							</button>
+
+							<button
+								onClick={() => navigate('/register-eventhost')}
+								className={`w-1/2 py-1 xl:py-3 text-center text-base font-normal relative z-10 transition-all duration-300 ease-in-out ${
+									!isLogin ? 'text-white' : 'text-button-color'
+								}`}
+							>
+								Register
+							</button>
+						</div>
 					</div>
 
 					<form
@@ -113,6 +159,8 @@ const EventHostRegister: React.FC = () => {
 							>
 								{loading ? (
 									<div className='w-4 h-4 border-b-2 border-white rounded-full animate-spin'></div>
+								) : isLogin ? (
+									'Login'
 								) : (
 									'Register'
 								)}
@@ -138,4 +186,4 @@ const EventHostRegister: React.FC = () => {
 	);
 };
 
-export default EventHostRegister;
+export default EventHostAuth;

@@ -65,8 +65,8 @@ const Sidebar: React.FC<SideBarProps> = ({ setActiveTab, isSidebarOpen, toggleSi
 							label: 'Dashboard',
 							path: '/dashboard',
 							submenu: [
-								{ label: 'Add User', path: '/users/add', onClick: handleAddUserClick }, // Trigger modal
-								{ label: 'View Users', path: '/users/view' },
+								{ label: 'Add User', path: '', onClick: handleAddUserClick },
+								{ label: 'View Ticket', path: '/tickets' },
 							],
 						},
 						{

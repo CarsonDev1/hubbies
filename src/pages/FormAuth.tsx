@@ -58,6 +58,7 @@ const FormAuth: React.FC = () => {
 					localStorage.setItem('token', response.data.accessToken);
 					navigate('/');
 					toast.success('Login successful!');
+					window.location.reload();
 				}
 			}
 		} catch (error: any) {

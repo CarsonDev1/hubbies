@@ -17,6 +17,7 @@ import Profile from './pages/Profile';
 import LandingPage from './pages/LandingPage';
 import Cart from './pages/Cart';
 import EventHostRegister from './pages/EventHostRegister';
+import TicketPost from './pages/TicketPost';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const navigate = useNavigate();
@@ -63,6 +64,14 @@ const App: React.FC = () => {
 					}
 				/>
 				<Route
+					path='/login-eventhost'
+					element={
+						<LoginLayout>
+							<EventHostRegister />
+						</LoginLayout>
+					}
+				/>
+				<Route
 					path='/'
 					element={
 						<ProtectedRoute>
@@ -88,7 +97,19 @@ const App: React.FC = () => {
 						</ProtectedRoute>
 					}
 				/>
-				{/* Protected Routes */}
+				<Route
+					path='/tickets'
+					element={
+						<ProtectedRoute>
+							<>
+								<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+									<TicketPost />
+								</AdminLayout>
+								<Footer />
+							</>
+						</ProtectedRoute>
+					}
+				/>
 				<Route
 					path='/dashboard'
 					element={
