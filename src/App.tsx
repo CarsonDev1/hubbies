@@ -100,7 +100,20 @@ const App: React.FC = () => {
 					}
 				/>
 				<Route
-					path='/tickets'
+					path='/dashboard/users'
+					element={
+						<ProtectedRoute>
+							<>
+								<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+									<UserManagement />
+								</AdminLayout>
+								<Footer />
+							</>
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path='/dashboard/tickets'
 					element={
 						<ProtectedRoute>
 							<>
@@ -113,7 +126,7 @@ const App: React.FC = () => {
 					}
 				/>
 				<Route
-					path='/category'
+					path='/dashboard/category'
 					element={
 						<ProtectedRoute>
 							<>
@@ -126,7 +139,7 @@ const App: React.FC = () => {
 					}
 				/>
 				<Route
-					path='/feedback'
+					path='/dashboard/feedback'
 					element={
 						<ProtectedRoute>
 							<>

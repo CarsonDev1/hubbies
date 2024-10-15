@@ -65,10 +65,10 @@ const Sidebar: React.FC<SideBarProps> = ({ setActiveTab, isSidebarOpen, toggleSi
 							label: 'Dashboard',
 							path: '/dashboard',
 							submenu: [
-								{ label: 'Add User', path: '', onClick: handleAddUserClick },
-								{ label: 'View Ticket', path: '/tickets' },
-								{ label: 'View Category', path: '/category' },
-								{ label: 'View FeedBack', path: '/feedback' },
+								{ label: 'View User', path: '/dashboard/users' },
+								{ label: 'View Ticket', path: '/dashboard/tickets' },
+								{ label: 'View Category', path: '/dashboard/category' },
+								{ label: 'View FeedBack', path: '/dashboard/feedback' },
 							],
 						},
 						{
@@ -111,8 +111,9 @@ const Sidebar: React.FC<SideBarProps> = ({ setActiveTab, isSidebarOpen, toggleSi
 								onClick={() => {
 									if (item.submenu) {
 										toggleSubmenu(item.id);
+									} else {
+										setActiveTab(item.id);
 									}
-									setActiveTab(item.id);
 								}}
 							>
 								<div className='flex items-center gap-2'>
@@ -143,8 +144,10 @@ const Sidebar: React.FC<SideBarProps> = ({ setActiveTab, isSidebarOpen, toggleSi
 													if (subItem.onClick) {
 														subItem.onClick();
 														e.preventDefault();
+													} else {
+														setActiveTab(subItem.label);
 													}
-													setActiveTab(item.id);
+													e.stopPropagation();
 												}}
 											>
 												{subItem.label}

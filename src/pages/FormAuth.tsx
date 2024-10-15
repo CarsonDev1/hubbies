@@ -57,6 +57,7 @@ const FormAuth: React.FC = () => {
 				const response = await axiosInstance.post('/auths/login', data);
 				if (response.status === 200) {
 					localStorage.setItem('token', response.data.accessToken);
+					localStorage.setItem('refreshToken', response.data.refreshToken);
 					const { accessToken } = response.data;
 					const decoded: any = jwtDecode(accessToken);
 					if (decoded?.role === 'EventHost') {

@@ -24,7 +24,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, setActiv
 				activeTab={activeTab}
 				setActiveTab={setActiveTab}
 			/>
-			<main className='flex-1 p-3 overflow-x-hidden overflow-y-auto lg:p-6'>
+			<main className='flex-1 p-3 overflow-x-hidden lg:p-6'>
 				{activeTab === 'profile' ? (
 					<ProfileHeader toggleSidebar={toggleSidebar} />
 				) : (

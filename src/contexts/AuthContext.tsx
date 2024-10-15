@@ -2,7 +2,6 @@ import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import LoadingSpinner from '../components/Loading/LoadingSpinner';
 
-// Định nghĩa interface cho AuthContext
 interface AuthContextType {
 	isAuthenticated: boolean;
 	token: string | null;
@@ -53,8 +52,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		}
 	};
 
+	const refreshAuthToken = () => {
+		const refreshToken = localStorage.getItem('refreshToken');
+		if (refreshToken) {
+			axios
+				.post('https://hubbies-be.azurewebsites.net/api/auths/refresh-token', {
+					refreshToken,
+				})
+				.then((response) => {
+					const newToken = response.data.token;
+					if (newToken) {
+						localStorage.setItem('token', newToken);
+						setToken(newToken);
+						setIsAuthenticated(true);
+					}
+				})
+				.catch(() => {
+					setIsAuthenticated(false);
+					logout();
+				});
+		}
+	};
+
 	useEffect(() => {
 		checkToken();
+
+		// Thiết lập interval mỗi 45 phút (2700000ms)
+		const intervalId = setInterval(() => {
+			refreshAuthToken();
+		}, 45 * 60 * 1000);
+
+		return () => clearInterval(intervalId);
 	}, []);
 
 	useEffect(() => {
@@ -80,6 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		setToken(null);
 		setIsAuthenticated(false);
 		localStorage.removeItem('token');
+		localStorage.removeItem('refreshToken');
 		checkToken();
 	};
 
