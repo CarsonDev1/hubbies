@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import LoadingSpinner from '../components/Loading/LoadingSpinner';
+import axiosInstance from '../utils/axiosIntance';
 
 interface AuthContextType {
 	isAuthenticated: boolean;
@@ -40,7 +41,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 						setIsAuthenticated(false);
 					}
 				})
-				.catch(() => {
+				.catch((error) => {
+					console.error('Error verifying token:', error.response || error.message);
 					setIsAuthenticated(false);
 				})
 				.finally(() => {
@@ -54,47 +56,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 	const refreshAuthToken = () => {
 		const refreshToken = localStorage.getItem('refreshToken');
-		if (refreshToken) {
-			axios
-				.post('https://hubbies-be.azurewebsites.net/api/auths/refresh-token', {
+		const expiredToken = token;
+
+		if (refreshToken && expiredToken) {
+			axiosInstance
+				.post('/auths/refresh-token', {
+					expiredToken,
 					refreshToken,
 				})
 				.then((response) => {
-					const newToken = response.data.token;
+					const newToken = response.data.accessToken;
 					if (newToken) {
 						localStorage.setItem('token', newToken);
 						setToken(newToken);
 						setIsAuthenticated(true);
+					} else {
+						console.error('No new token returned');
 					}
 				})
-				.catch(() => {
+				.catch((error) => {
+					console.error('Failed to refresh token:', error.response?.data || error.message);
 					setIsAuthenticated(false);
 					logout();
 				});
+		} else {
+			console.error('No refresh token or expired token found');
+			logout();
 		}
 	};
 
 	useEffect(() => {
 		checkToken();
 
-		// Thiết lập interval mỗi 45 phút (2700000ms)
 		const intervalId = setInterval(() => {
 			refreshAuthToken();
 		}, 45 * 60 * 1000);
 
 		return () => clearInterval(intervalId);
-	}, []);
-
-	useEffect(() => {
-		const handleStorageChange = () => {
-			checkToken();
-		};
-
-		window.addEventListener('storage', handleStorageChange);
-
-		return () => {
-			window.removeEventListener('storage', handleStorageChange);
-		};
 	}, []);
 
 	const login = (newToken: string) => {

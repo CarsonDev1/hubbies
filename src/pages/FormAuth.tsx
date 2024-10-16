@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginBody, LoginBodyType, RegisterBody, RegisterBodyType } from '../schemaValidations/auth.schema';
 import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';
+import { useAuth } from '../contexts/AuthContextMain';
 
 const FormAuth: React.FC = () => {
 	const navigate = useNavigate();
@@ -18,6 +19,7 @@ const FormAuth: React.FC = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [rememberMe, setRememberMe] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const { login } = useAuth();
 
 	useEffect(() => {
 		setIsLogin(location.pathname === '/login');
@@ -58,7 +60,8 @@ const FormAuth: React.FC = () => {
 				if (response.status === 200) {
 					localStorage.setItem('token', response.data.accessToken);
 					localStorage.setItem('refreshToken', response.data.refreshToken);
-					const { accessToken } = response.data;
+					const { accessToken, refreshToken } = response.data;
+					login({ accessToken, refreshToken });
 					const decoded: any = jwtDecode(accessToken);
 					if (decoded?.role === 'EventHost') {
 						navigate('/');

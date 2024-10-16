@@ -13,7 +13,7 @@ interface SideBarRootProps {
 const SideBarRoot: React.FC<SideBarRootProps> = ({ isSidebarOpen, toggleSidebar }) => {
 	return (
 		<aside
-			className={`fixed lg:static inset-y-0 left-0 transform h-dvh ${
+			className={`fixed lg:static inset-y-0 left-0 transform ${
 				isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
 			} lg:translate-x-0 w-64 md:w-80 bg-[#f9f3e3] flex flex-col gap-20 items-center p-6 transition-transform duration-300 ease-in-out z-20 border-r-2 border-button-color`}
 		>

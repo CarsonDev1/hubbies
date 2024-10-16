@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginLayout from './layout/LoginLayout';
 import AdminLayout from './layout/AdminLayout';
 import FormAuth from './pages/FormAuth';
@@ -20,18 +20,19 @@ import EventHostRegister from './pages/EventHostRegister';
 import TicketPost from './pages/TicketPost';
 import CategoryEvent from './pages/CategoryEvent';
 import FeedBack from './pages/FeedBack';
+import DashBoardMain from './pages/DashBoardMain';
+import LoginComponent from './pages/LoginComponent';
+import { AuthProvider, useAuth } from './contexts/AuthContextMain';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-	const navigate = useNavigate();
-	const isAuthenticated = !!localStorage.getItem('token');
+	const { isAuthenticated } = useAuth();
 
-	useEffect(() => {
-		if (!isAuthenticated) {
-			navigate('/landing-page');
-		}
-	}, [isAuthenticated, navigate]);
+	if (!isAuthenticated) {
+		window.location.href = '/login';
+		return null;
+	}
 
-	return <>{isAuthenticated ? children : null}</>;
+	return <>{children}</>;
 };
 
 const App: React.FC = () => {
@@ -159,6 +160,26 @@ const App: React.FC = () => {
 								<Dashboard />
 							</AdminLayout>
 						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path='/login-main'
+					element={
+						<AuthProvider>
+							<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+								<LoginComponent />
+							</AdminLayout>
+						</AuthProvider>
+					}
+				/>
+				<Route
+					path='/dashboard-main'
+					element={
+						<AuthProvider>
+							<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+								<DashBoardMain />
+							</AdminLayout>
+						</AuthProvider>
 					}
 				/>
 				<Route

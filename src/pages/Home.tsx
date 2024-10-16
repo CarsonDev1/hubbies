@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Suspense } from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
@@ -9,10 +10,21 @@ import { useState } from 'react';
 import { LuMap } from 'react-icons/lu';
 import { IoPaperPlaneOutline } from 'react-icons/io5';
 import LoadingSpinner from '../components/Loading/LoadingSpinner';
+import { useAuth } from '../contexts/AuthContextMain';
+import { jwtDecode } from 'jwt-decode';
 
 const Home = () => {
+	const { isAuthenticated } = useAuth();
 	const [selectedDate, setSelectedDate] = useState(18);
 	const [highlightedDate] = useState(12);
+
+	const accessToken = localStorage.getItem('accessToken') ?? '';
+	const decodedRole: any = jwtDecode(accessToken);
+
+	if (!isAuthenticated) {
+		window.location.href = '/login';
+		return null;
+	}
 
 	const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 	const dates = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -134,34 +146,39 @@ const Home = () => {
 					</div>
 
 					{/* Calendar Section */}
-					<div className='p-4 font-sans h-fit bg-[#FFD583] rounded-xl w-full md:w-1/2 xl:w-1/4'>
-						<h2 className='mb-4 text-xl font-bold'>January 2023</h2>
-						<div className='grid grid-cols-7 gap-2 justify-items-center'>
-							{days.map((day, index) => (
-								<div key={day} className={`text-center font-medium ${index > 4 ? 'text-red-500' : ''}`}>
-									{day}
-								</div>
-							))}
-							{[...Array(dates[0] - 1)].map((_, index) => (
-								<div key={`empty-${index}`} />
-							))}
-							{dates.map((date) => (
-								<button
-									key={date}
-									className={`w-8 h-8 flex items-center justify-center rounded-full ${
-										date === selectedDate
-											? 'bg-amber-700 text-white'
-											: date === highlightedDate
-											? 'bg-gray-200'
-											: ''
-									} ${[7, 8, 14, 15, 21, 22, 28, 29].includes(date) ? 'text-red-500' : ''}`}
-									onClick={() => setSelectedDate(date)}
-								>
-									{date}
-								</button>
-							))}
+					{decodedRole?.role !== 'EventHost' && (
+						<div className='p-4 font-sans h-fit bg-[#FFD583] rounded-xl w-full md:w-1/2 xl:w-1/4'>
+							<h2 className='mb-4 text-xl font-bold'>January 2023</h2>
+							<div className='grid grid-cols-7 gap-2 justify-items-center'>
+								{days.map((day, index) => (
+									<div
+										key={day}
+										className={`text-center font-medium ${index > 4 ? 'text-red-500' : ''}`}
+									>
+										{day}
+									</div>
+								))}
+								{[...Array(dates[0] - 1)].map((_, index) => (
+									<div key={`empty-${index}`} />
+								))}
+								{dates.map((date) => (
+									<button
+										key={date}
+										className={`w-8 h-8 flex items-center justify-center rounded-full ${
+											date === selectedDate
+												? 'bg-amber-700 text-white'
+												: date === highlightedDate
+												? 'bg-gray-200'
+												: ''
+										} ${[7, 8, 14, 15, 21, 22, 28, 29].includes(date) ? 'text-red-500' : ''}`}
+										onClick={() => setSelectedDate(date)}
+									>
+										{date}
+									</button>
+								))}
+							</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</div>
 		</Suspense>
