@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import SideBarRoot from '../components/SideBarRoot/SideBarRoot';
-import { Button } from '../components/ui/button';
-import { Menu } from 'lucide-react';
 import { RiSearch2Line, RiShoppingBag3Line } from 'react-icons/ri';
+import { Camera, Menu } from 'lucide-react';
+import { Button } from '../components/ui/button';
 import Avt from '../assets/images/avt.png';
 import Logo from '../assets/images/logo.png';
 import { useAuth } from '../contexts/AuthContextMain';
 import { jwtDecode } from 'jwt-decode';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import 'react-toastify/dist/ReactToastify.css';
+import { useForm } from 'react-hook-form';
 
 interface RootLayoutProps {
 	children: React.ReactNode;
@@ -17,11 +20,51 @@ interface RootLayoutProps {
 	setActiveTab: (tab: string) => void;
 }
 
+type FormData = {
+	photo: File | null;
+	host: string;
+	price: number;
+	time: string;
+	date: string;
+	place: string;
+	description: string;
+};
+
+const schema = z.object({
+	photo: z.instanceof(File).nullable().optional(),
+	host: z.string().nonempty({ message: 'Host name is required' }),
+	price: z.preprocess(
+		(val) => (typeof val === 'string' ? parseFloat(val) : val),
+		z.number().positive({ message: 'Price must be a positive number' })
+	),
+	time: z.string().nonempty({ message: 'Time is required' }),
+	date: z.string().nonempty({ message: 'Date is required' }),
+	place: z.string().nonempty({ message: 'Place is required' }),
+	description: z
+		.string()
+		.min(50, 'Description must be at least 50 characters')
+		.max(200, 'Description must be no more than 200 characters'),
+});
+
 const RootLayout: React.FC<RootLayoutProps> = ({ children, activeTab, setActiveTab }) => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const { logout, user, fetchUserData } = useAuth();
 	const accessToken = localStorage.getItem('accessToken') ?? '';
 	const decodedRole: any = jwtDecode(accessToken);
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm({
+		resolver: zodResolver(schema),
+	});
+
+	const onSubmit = (data: any) => {
+		console.log(data);
+		setIsDialogOpen(false);
+	};
 
 	useEffect(() => {
 		if (!user) {
@@ -51,13 +94,18 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, activeTab, setActiveT
 						</Button>
 					</div>
 					<div className='items-center justify-around hidden mb-6 lg:flex'>
-						<div className='relative'>
-							<RiSearch2Line className='absolute transform -translate-y-1/2 text-[#D1B186] left-3 top-1/2' />
-							<input
-								type='text'
-								placeholder='Search workshop'
-								className='pl-5 xl:pl-10 pr-3 py-2 xl:py-4 border border-button-color rounded-full w-80 xl:w-96 bg-transparent focus:outline-none placeholder:text-[#D1B186]'
-							/>
+						<div className='relative flex items-center gap-4'>
+							<div className='relative'>
+								<RiSearch2Line className='absolute transform -translate-y-1/2 text-[#D1B186] left-3 top-1/2' />
+								<input
+									type='text'
+									placeholder='Search workshop'
+									className='pl-5 xl:pl-10 pr-3 py-2 xl:py-4 border border-button-color rounded-full w-80 xl:w-96 bg-transparent focus:outline-none placeholder:text-[#D1B186]'
+								/>
+							</div>
+							<div className='bg-[#ffca66] p-3 rounded-full'>
+								<Camera className='text-button-color' />
+							</div>
 						</div>
 						<div className='flex items-center gap-6'>
 							<div className='flex items-center space-x-2' onClick={logout}>

@@ -22,7 +22,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-	const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('accessToken'));
+	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!localStorage.getItem('accessToken'));
 	const [user, setUser] = useState<User | null>(null);
 
 	const login = ({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) => {
@@ -39,20 +39,59 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		setUser(null);
 	};
 
-	const fetchUserData = async () => {
+	const refreshAccessToken = async (): Promise<string | null> => {
 		try {
-			const accessToken = localStorage.getItem('accessToken');
+			const expiredToken = localStorage.getItem('accessToken');
+			const refreshToken = localStorage.getItem('refreshToken');
+
+			if (!expiredToken || !refreshToken) return null;
+
+			const response = await axios.post('https://hubbies-be.azurewebsites.net/api/auths/refresh-token', {
+				expiredToken,
+				refreshToken,
+			});
+
+			const { accessToken, refreshToken: newRefreshToken } = response.data;
+			localStorage.setItem('accessToken', accessToken);
+			localStorage.setItem('refreshToken', newRefreshToken);
+
+			return accessToken;
+		} catch (error) {
+			console.error('Error refreshing token:', error);
+			logout();
+			return null;
+		}
+	};
+
+	const fetchUserData = async (): Promise<void> => {
+		try {
+			let accessToken = localStorage.getItem('accessToken');
 			if (!accessToken) return;
 
-			const response = await axios.get('https://hubbies-be.azurewebsites.net/api/accounts', {
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-				},
-			});
-			setUser(response.data);
+			try {
+				const response = await axios.get('https://hubbies-be.azurewebsites.net/api/accounts', {
+					headers: {
+						Authorization: `Bearer ${accessToken}`,
+					},
+				});
+				setUser(response.data);
+			} catch (error: any) {
+				if (error.response && error.response.status === 401) {
+					accessToken = await refreshAccessToken();
+					if (accessToken) {
+						const response = await axios.get('https://hubbies-be.azurewebsites.net/api/accounts', {
+							headers: {
+								Authorization: `Bearer ${accessToken}`,
+							},
+						});
+						setUser(response.data);
+					}
+				} else {
+					console.error('Error fetching user data:', error);
+				}
+			}
 		} catch (error) {
 			console.error('Error fetching user data:', error);
-			// Xử lý lỗi khi fetch user data, ví dụ: hết hạn token
 		}
 	};
 
@@ -64,7 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 };
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
 	const context = useContext(AuthContext);
 	if (!context) {
 		throw new Error('useAuth must be used within an AuthProvider');
