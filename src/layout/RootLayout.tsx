@@ -31,6 +31,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Category } from '../pages/CategoryEvent';
 import { getAllCategory } from '../api/category/getCategories';
 import { Select, SelectTrigger, SelectItem, SelectContent, SelectValue } from '../components/ui/select';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { storage } from '../firebase/firebase';
 
 interface RootLayoutProps {
 	children: React.ReactNode;
@@ -97,10 +99,34 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, activeTab, setActiveT
 	});
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		if (!user) {
+			toast.error('You must be signed in to upload files.');
+			return;
+		}
+
 		if (event.target.files && event.target.files[0]) {
-			const fileUrl = URL.createObjectURL(event.target.files[0]);
-			setSelectedFile(fileUrl);
-			setValue('photo', fileUrl);
+			const file = event.target.files[0];
+			const storageRef = ref(storage, `images/${file.name}`);
+			const uploadTask = uploadBytesResumable(storageRef, file);
+
+			uploadTask.on(
+				'state_changed',
+				(snapshot: any) => {
+					const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+					console.log('Upload is ' + progress + '% done');
+				},
+				(error: any) => {
+					console.error('Upload failed:', error);
+					toast.error('Upload failed');
+				},
+				() => {
+					getDownloadURL(uploadTask.snapshot.ref).then((downloadURL: string) => {
+						console.log('File available at', downloadURL);
+						setSelectedFile(downloadURL); // Save file URL to state
+						setValue('photo', downloadURL); // Set value to form
+					});
+				}
+			);
 		}
 	};
 
