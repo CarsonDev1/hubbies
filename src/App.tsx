@@ -88,16 +88,14 @@ const App: React.FC = () => {
 					}
 				/>
 				<Route
-					path='/cart'
+					path='/cart/:ticketId'
 					element={
-						<ProtectedRoute>
-							<>
-								<RootLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-									<Cart />
-								</RootLayout>
-								<Footer />
-							</>
-						</ProtectedRoute>
+						<>
+							<RootLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+								<Cart />
+							</RootLayout>
+							<Footer />
+						</>
 					}
 				/>
 				<Route

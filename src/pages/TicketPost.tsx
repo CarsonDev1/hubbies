@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { InvalidateQueryFilters, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { getTicketEvents } from '../api/tickets/getTicket';
-import { useAuth } from '../contexts/AuthContextMain';
 import { EditIcon, TrashIcon } from 'lucide-react';
 import { updateTicket } from '../api/tickets/updateTicket';
 import Swal from 'sweetalert2';
@@ -11,9 +10,10 @@ import { Dialog, DialogContent } from '../components/ui/dialog';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { getAllCategory } from '../api/category/getCategories';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'; // Import Select từ Shadcn UI
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { storage } from '../firebase/firebase';
+import { deleteTicket } from '../api/tickets/deleteTicket';
 
 export interface TicketPost {
 	id: string;
@@ -35,8 +35,6 @@ export interface TicketPost {
 
 const TicketPost: React.FC = () => {
 	const queryClient = useQueryClient();
-	const { user } = useAuth();
-	const eventHostId = user?.id ?? '';
 	const page = 1;
 	const pageSize = 10;
 
@@ -56,8 +54,8 @@ const TicketPost: React.FC = () => {
 	});
 
 	const { data, isLoading, isError } = useQuery({
-		queryKey: ['listTickets', eventHostId, page, pageSize],
-		queryFn: () => getTicketEvents(eventHostId, page, pageSize),
+		queryKey: ['listTickets', page, pageSize],
+		queryFn: () => getTicketEvents(page, pageSize),
 		select: (response) => response.data,
 	});
 
@@ -94,14 +92,15 @@ const TicketPost: React.FC = () => {
 		mutationFn: async (ticketData: { id: string; ticketDetails: FormData }) => {
 			try {
 				const response = await updateTicket(ticketData);
+				console.log('Update Ticket response:', response); // Log kết quả API
 				return response;
 			} catch (error) {
-				// Log lỗi chi tiết để debug
-				console.error('Error in updating ticket:', error);
+				console.error('Error in updating ticket:', error); // Log lỗi chi tiết để debug
 				throw error;
 			}
 		},
 		onSuccess: () => {
+			console.log('Update successful'); // Kiểm tra xem đã vào onSuccess chưa
 			queryClient.invalidateQueries({ queryKey: ['listTickets'] });
 			Swal.fire({
 				title: 'Success!',
@@ -109,12 +108,10 @@ const TicketPost: React.FC = () => {
 				icon: 'success',
 				confirmButtonText: 'OK',
 			});
-			setOpen(false);
+			setOpen(false); // Đóng form
 		},
 		onError: (error: any) => {
-			// Log chi tiết lỗi trả về từ server
-			console.error('Error updating ticket:', error);
-
+			console.error('Error updating ticket:', error); // Log lỗi chi tiết
 			Swal.fire({
 				title: 'Error!',
 				text: `There was an error updating the ticket. Error: ${error.message || 'Unknown error'}`,
@@ -123,6 +120,50 @@ const TicketPost: React.FC = () => {
 			});
 		},
 	});
+
+	const { mutate: mutateDeleteTicket } = useMutation({
+		mutationFn: async (id: string) => {
+			try {
+				await deleteTicket(id);
+			} catch (error) {
+				console.error('Error during category deletion:', error);
+				throw error;
+			}
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries(['listTickets'] as unknown as InvalidateQueryFilters);
+			Swal.fire({
+				title: 'Success!',
+				text: 'Ticket deleted successfully.',
+				icon: 'success',
+				confirmButtonText: 'OK',
+			});
+		},
+		onError: (error: any) => {
+			console.error('Error deleting Ticket:', error);
+			Swal.fire({
+				title: 'Error!',
+				text: 'There was an error deleting the Ticket.',
+				icon: 'error',
+				confirmButtonText: 'OK',
+			});
+		},
+	});
+
+	const handleDelete = (id: string) => {
+		Swal.fire({
+			title: 'Are you sure?',
+			text: "You won't be able to revert this!",
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: 'Yes, delete it!',
+			cancelButtonText: 'No, cancel!',
+		}).then((result) => {
+			if (result.isConfirmed) {
+				mutateDeleteTicket(id);
+			}
+		});
+	};
 
 	const handleEditClick = (ticket: TicketPost) => {
 		setSelectedTicket(ticket);
@@ -140,7 +181,8 @@ const TicketPost: React.FC = () => {
 		setOpen(true);
 	};
 
-	const handleSubmit = () => {
+	const handleSubmit = (event: React.FormEvent) => {
+		event.preventDefault();
 		if (selectedTicket) {
 			const formData = new FormData();
 			formData.append('name', ticketDetails.name);
@@ -177,6 +219,7 @@ const TicketPost: React.FC = () => {
 			<Table>
 				<TableHeader>
 					<TableRow>
+						<TableHead>Id</TableHead>
 						<TableHead>Name</TableHead>
 						<TableHead>Description</TableHead>
 						<TableHead>Content</TableHead>
@@ -195,9 +238,16 @@ const TicketPost: React.FC = () => {
 				<TableBody>
 					{data?.map((event: TicketPost) => (
 						<TableRow key={event.id}>
+							<TableCell>{event.id}</TableCell>
 							<TableCell>{event.name}</TableCell>
-							<TableCell>{event.description}</TableCell>
-							<TableCell>{event.content}</TableCell>
+							<TableCell className='w-10'>
+								{event.description.length > 20
+									? `${event.description.substring(0, 20)}...`
+									: event.description}
+							</TableCell>
+							<TableCell className='w-10'>
+								{event.content.length > 20 ? `${event.content.substring(0, 20)}...` : event.content}
+							</TableCell>
 							<TableCell>{event.quantity}</TableCell>
 							<TableCell>{event.price}</TableCell>
 							<TableCell>{event.status}</TableCell>
@@ -213,7 +263,7 @@ const TicketPost: React.FC = () => {
 							</TableCell>
 							<TableCell>
 								<EditIcon className='cursor-pointer' onClick={() => handleEditClick(event)} />
-								<TrashIcon className='cursor-pointer' />
+								<TrashIcon className='cursor-pointer' onClick={() => handleDelete(event.id)} />
 							</TableCell>
 						</TableRow>
 					))}
@@ -247,7 +297,7 @@ const TicketPost: React.FC = () => {
 									onChange={(e) =>
 										setTicketDetails({ ...ticketDetails, description: e.target.value })
 									}
-									className='bg-[#FFE4B5] border-[#D2B48C]'
+									className='bg-[#FFE4B5] border-[#D2B48C] w-32 truncate'
 								/>
 							</div>
 
@@ -259,7 +309,7 @@ const TicketPost: React.FC = () => {
 									id='content'
 									value={ticketDetails.content}
 									onChange={(e) => setTicketDetails({ ...ticketDetails, content: e.target.value })}
-									className='bg-[#FFE4B5] border-[#D2B48C]'
+									className='bg-[#FFE4B5] border-[#D2B48C] w-32 truncate'
 								/>
 							</div>
 

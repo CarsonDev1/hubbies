@@ -2,6 +2,7 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { Button } from '../ui/button';
 import Logo from '../../assets/images/logo.png';
+import { Link } from 'react-router-dom';
 
 interface SideBarRootProps {
 	isSidebarOpen: boolean;
@@ -20,9 +21,11 @@ const SideBarRoot: React.FC<SideBarRootProps> = ({ isSidebarOpen, toggleSidebar 
 			<Button variant='ghost' size='icon' className='absolute top-4 right-4 lg:hidden' onClick={toggleSidebar}>
 				<X className='w-6 h-6' />
 			</Button>
-			<div className='mt-16 mb-12 lg:mt-0'>
-				<img src={Logo} alt='Logo' width={118} height={61} />
-			</div>
+			<Link to='/'>
+				<div className='mt-16 mb-12 lg:mt-0'>
+					<img src={Logo} alt='Logo' width={118} height={61} />
+				</div>
+			</Link>
 			<nav className='space-y-6'>
 				{['HOME', 'DISCOVERY', 'FEATURES', 'PROFILE'].map((item) => (
 					<Button
