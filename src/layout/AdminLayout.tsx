@@ -31,7 +31,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, setActiv
 					<Header toggleSidebar={toggleSidebar} />
 				)}
 
-				<div className='mx-auto pt-14'>
+				<div className='mx-auto'>
 					{children}
 					<ToastContainer />
 				</div>

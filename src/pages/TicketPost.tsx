@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { InvalidateQueryFilters, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { getTicketEvents } from '../api/tickets/getTicket';
 import { EditIcon, TrashIcon } from 'lucide-react';
-import { updateTicket } from '../api/tickets/updateTicket';
 import Swal from 'sweetalert2';
-import { useState } from 'react';
 import { Dialog, DialogContent } from '../components/ui/dialog';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
-import { getAllCategory } from '../api/category/getCategories';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { storage } from '../firebase/firebase';
+import { getAllCategory } from '../api/category/getCategories';
+import { getTicketEvents } from '../api/tickets/getTicket';
+import { updateTicket } from '../api/tickets/updateTicket';
 import { deleteTicket } from '../api/tickets/deleteTicket';
 
 export interface TicketPost {
@@ -23,7 +23,7 @@ export interface TicketPost {
 	quantity: number;
 	price: number;
 	status: string;
-	approvalStatus: string;
+	approvalStatus: 'Pending' | 'Approved' | 'Rejected';
 	address: string;
 	postDate: string;
 	image: string;
@@ -51,6 +51,7 @@ const TicketPost: React.FC = () => {
 		address: '',
 		postDate: '',
 		image: '',
+		approvalStatus: 'Pending' as 'Pending' | 'Approved' | 'Rejected', // Track approval status here
 	});
 
 	const { data, isLoading, isError } = useQuery({
@@ -90,17 +91,10 @@ const TicketPost: React.FC = () => {
 
 	const { mutate: mutateUpdateTicket } = useMutation({
 		mutationFn: async (ticketData: { id: string; ticketDetails: FormData }) => {
-			try {
-				const response = await updateTicket(ticketData);
-				console.log('Update Ticket response:', response); // Log kết quả API
-				return response;
-			} catch (error) {
-				console.error('Error in updating ticket:', error); // Log lỗi chi tiết để debug
-				throw error;
-			}
+			const response = await updateTicket(ticketData);
+			return response;
 		},
 		onSuccess: () => {
-			console.log('Update successful'); // Kiểm tra xem đã vào onSuccess chưa
 			queryClient.invalidateQueries({ queryKey: ['listTickets'] });
 			Swal.fire({
 				title: 'Success!',
@@ -108,10 +102,9 @@ const TicketPost: React.FC = () => {
 				icon: 'success',
 				confirmButtonText: 'OK',
 			});
-			setOpen(false); // Đóng form
+			setOpen(false); // Close the form
 		},
 		onError: (error: any) => {
-			console.error('Error updating ticket:', error); // Log lỗi chi tiết
 			Swal.fire({
 				title: 'Error!',
 				text: `There was an error updating the ticket. Error: ${error.message || 'Unknown error'}`,
@@ -123,15 +116,10 @@ const TicketPost: React.FC = () => {
 
 	const { mutate: mutateDeleteTicket } = useMutation({
 		mutationFn: async (id: string) => {
-			try {
-				await deleteTicket(id);
-			} catch (error) {
-				console.error('Error during category deletion:', error);
-				throw error;
-			}
+			await deleteTicket(id);
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries(['listTickets'] as unknown as InvalidateQueryFilters);
+			queryClient.invalidateQueries({ queryKey: ['listTickets'] });
 			Swal.fire({
 				title: 'Success!',
 				text: 'Ticket deleted successfully.',
@@ -139,8 +127,7 @@ const TicketPost: React.FC = () => {
 				confirmButtonText: 'OK',
 			});
 		},
-		onError: (error: any) => {
-			console.error('Error deleting Ticket:', error);
+		onError: () => {
 			Swal.fire({
 				title: 'Error!',
 				text: 'There was an error deleting the Ticket.',
@@ -149,21 +136,6 @@ const TicketPost: React.FC = () => {
 			});
 		},
 	});
-
-	const handleDelete = (id: string) => {
-		Swal.fire({
-			title: 'Are you sure?',
-			text: "You won't be able to revert this!",
-			icon: 'warning',
-			showCancelButton: true,
-			confirmButtonText: 'Yes, delete it!',
-			cancelButtonText: 'No, cancel!',
-		}).then((result) => {
-			if (result.isConfirmed) {
-				mutateDeleteTicket(id);
-			}
-		});
-	};
 
 	const handleEditClick = (ticket: TicketPost) => {
 		setSelectedTicket(ticket);
@@ -176,6 +148,7 @@ const TicketPost: React.FC = () => {
 			address: ticket.address,
 			postDate: ticket.postDate,
 			image: ticket.image,
+			approvalStatus: ticket.approvalStatus, // Set the existing approval status
 		});
 		setSelectedCategoryId(ticket.eventCategoryId);
 		setOpen(true);
@@ -194,12 +167,28 @@ const TicketPost: React.FC = () => {
 			formData.append('postDate', ticketDetails.postDate);
 			formData.append('image', selectedFile ?? ticketDetails.image);
 			formData.append('eventCategoryId', selectedCategoryId ?? '');
+			formData.append('approvalStatus', ticketDetails.approvalStatus); // Make sure approval status is included
 
 			mutateUpdateTicket({
 				id: selectedTicket.id,
 				ticketDetails: formData,
 			});
 		}
+	};
+
+	const handleDelete = (id: string) => {
+		Swal.fire({
+			title: 'Are you sure?',
+			text: "You won't be able to revert this!",
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: 'Yes, delete it!',
+			cancelButtonText: 'No, cancel!',
+		}).then((result) => {
+			if (result.isConfirmed) {
+				mutateDeleteTicket(id);
+			}
+		});
 	};
 
 	if (isLoading) {
@@ -219,7 +208,6 @@ const TicketPost: React.FC = () => {
 			<Table>
 				<TableHeader>
 					<TableRow>
-						<TableHead>Id</TableHead>
 						<TableHead>Name</TableHead>
 						<TableHead>Description</TableHead>
 						<TableHead>Content</TableHead>
@@ -238,7 +226,6 @@ const TicketPost: React.FC = () => {
 				<TableBody>
 					{data?.map((event: TicketPost) => (
 						<TableRow key={event.id}>
-							<TableCell>{event.id}</TableCell>
 							<TableCell>{event.name}</TableCell>
 							<TableCell className='w-10'>
 								{event.description.length > 20
@@ -251,7 +238,26 @@ const TicketPost: React.FC = () => {
 							<TableCell>{event.quantity}</TableCell>
 							<TableCell>{event.price}</TableCell>
 							<TableCell>{event.status}</TableCell>
-							<TableCell>{event.approvalStatus}</TableCell>
+							<TableCell>
+								<Select
+									value={ticketDetails.approvalStatus} // Bind approval status to current state
+									onValueChange={(value) =>
+										setTicketDetails({
+											...ticketDetails,
+											approvalStatus: value as 'Pending' | 'Approved' | 'Rejected', // Update local state
+										})
+									}
+								>
+									<SelectTrigger>
+										<SelectValue placeholder='Select status' />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value='Pending'>Pending</SelectItem>
+										<SelectItem value='Approved'>Approved</SelectItem>
+										<SelectItem value='Rejected'>Rejected</SelectItem>
+									</SelectContent>
+								</Select>
+							</TableCell>
 							<TableCell>{event.address}</TableCell>
 							<TableCell>{new Date(event.postDate).toLocaleDateString()}</TableCell>
 							<TableCell>
@@ -297,7 +303,7 @@ const TicketPost: React.FC = () => {
 									onChange={(e) =>
 										setTicketDetails({ ...ticketDetails, description: e.target.value })
 									}
-									className='bg-[#FFE4B5] border-[#D2B48C] w-32 truncate'
+									className='bg-[#FFE4B5] border-[#D2B48C]'
 								/>
 							</div>
 
@@ -309,7 +315,7 @@ const TicketPost: React.FC = () => {
 									id='content'
 									value={ticketDetails.content}
 									onChange={(e) => setTicketDetails({ ...ticketDetails, content: e.target.value })}
-									className='bg-[#FFE4B5] border-[#D2B48C] w-32 truncate'
+									className='bg-[#FFE4B5] border-[#D2B48C]'
 								/>
 							</div>
 
@@ -400,10 +406,35 @@ const TicketPost: React.FC = () => {
 									</SelectContent>
 								</Select>
 							</div>
+
+							<div>
+								<label htmlFor='approvalStatus' className='text-[#8B4513]'>
+									Approval Status
+								</label>
+								<Select
+									onValueChange={(value) =>
+										setTicketDetails({
+											...ticketDetails,
+											approvalStatus: value as 'Pending' | 'Approved' | 'Rejected',
+										})
+									}
+									value={ticketDetails.approvalStatus} // Set the current approval status in the select field
+								>
+									<SelectTrigger>
+										<SelectValue placeholder='Select status' />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value='Pending'>Pending</SelectItem>
+										<SelectItem value='Approved'>Approved</SelectItem>
+										<SelectItem value='Rejected'>Rejected</SelectItem>
+									</SelectContent>
+								</Select>
+							</div>
+
+							<Button type='submit' className='mt-4 bg-[#FFA500] hover:bg-[#FF8C00] text-white'>
+								Update
+							</Button>
 						</div>
-						<Button type='submit' className='mt-4 bg-[#FFA500] hover:bg-[#FF8C00] text-white'>
-							Update
-						</Button>
 					</form>
 				</DialogContent>
 			</Dialog>

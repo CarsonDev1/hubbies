@@ -33,6 +33,7 @@ import { getAllCategory } from '../api/category/getCategories';
 import { Select, SelectTrigger, SelectItem, SelectContent, SelectValue } from '../components/ui/select';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { storage } from '../firebase/firebase';
+import { Link } from 'react-router-dom';
 
 interface RootLayoutProps {
 	children: React.ReactNode;
@@ -79,6 +80,7 @@ const schema = z.object({
 const RootLayout: React.FC<RootLayoutProps> = ({ children, activeTab, setActiveTab }) => {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [cartCount, setCartCount] = useState(0);
 	const { logout, user, fetchUserData } = useAuth();
 	const [selectedFile, setSelectedFile] = useState<string | null>(null);
 	const accessToken = localStorage.getItem('accessToken') ?? '';
@@ -97,6 +99,24 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, activeTab, setActiveT
 		queryKey: ['listCategories'],
 		queryFn: getAllCategory,
 	});
+
+	useEffect(() => {
+		const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+		setCartCount(storedCart.length);
+	}, []);
+
+	useEffect(() => {
+		const handleCartUpdate = () => {
+			const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+			setCartCount(storedCart.length);
+		};
+
+		window.addEventListener('cart-updated', handleCartUpdate);
+
+		return () => {
+			window.removeEventListener('cart-updated', handleCartUpdate);
+		};
+	}, []);
 
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		if (!user) {
@@ -183,7 +203,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, activeTab, setActiveT
 					activeTab={activeTab}
 					setActiveTab={setActiveTab}
 				/>
-				<main className='flex-1 w-full overflow-hidden p-2 md:p-4 lg:p-8 h-full bg-[#f9f3e3]'>
+				<main className='flex-1 w-full overflow-hidden p-2 md:p-4 lg:p-8 bg-[#f9f3e3]'>
 					<div className='flex items-center justify-between mb-4 lg:hidden'>
 						<Button variant='ghost' size='icon' onClick={toggleSidebar}>
 							<Menu className='w-6 h-6' />
@@ -225,12 +245,14 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, activeTab, setActiveT
 									)}
 								</div>
 							</div>
-							<div className='relative'>
-								<RiShoppingBag3Line className='size-6' />
-								<span className='absolute bottom-0 right-0 px-2 py-1 text-xs text-white translate-x-1/2 translate-y-1/2 rounded-full bg-button-color'>
-									0
-								</span>
-							</div>
+							<Link to='/cart-payment'>
+								<div className='relative'>
+									<RiShoppingBag3Line className='size-6' />
+									<span className='absolute bottom-0 right-0 px-2 py-1 text-xs text-white translate-x-1/2 translate-y-1/2 rounded-full bg-button-color'>
+										{cartCount}
+									</span>
+								</div>
+							</Link>
 						</div>
 					</div>
 					<div className='w-full mx-auto'>

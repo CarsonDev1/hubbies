@@ -15,7 +15,7 @@ import Notifications from './pages/Notifications';
 import Customization from './pages/Customization';
 import Profile from './pages/Profile';
 import LandingPage from './pages/LandingPage';
-import Cart from './pages/Cart';
+import Cart from './pages/Detail';
 import EventHostRegister from './pages/EventHostRegister';
 import TicketPost from './pages/TicketPost';
 import CategoryEvent from './pages/CategoryEvent';
@@ -23,6 +23,8 @@ import FeedBack from './pages/FeedBack';
 import DashBoardMain from './pages/DashBoardMain';
 import LoginComponent from './pages/LoginComponent';
 import { AuthProvider, useAuth } from './contexts/AuthContextMain';
+import CartPayment from './pages/CartPayment';
+import ViewOrder from './pages/ViewOrder';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const { isAuthenticated } = useAuth();
@@ -99,6 +101,17 @@ const App: React.FC = () => {
 					}
 				/>
 				<Route
+					path='/cart-payment'
+					element={
+						<>
+							<RootLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+								<CartPayment />
+							</RootLayout>
+							<Footer />
+						</>
+					}
+				/>
+				<Route
 					path='/dashboard/users'
 					element={
 						<ProtectedRoute>
@@ -144,6 +157,19 @@ const App: React.FC = () => {
 							<>
 								<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
 									<FeedBack />
+								</AdminLayout>
+								<Footer />
+							</>
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path='/dashboard/order'
+					element={
+						<ProtectedRoute>
+							<>
+								<AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+									<ViewOrder />
 								</AdminLayout>
 								<Footer />
 							</>

@@ -68,7 +68,7 @@ const Sidebar: React.FC<SideBarProps> = ({ setActiveTab, isSidebarOpen, toggleSi
 								{ label: 'View User', path: '/dashboard/users' },
 								{ label: 'View Ticket', path: '/dashboard/tickets' },
 								{ label: 'View Category', path: '/dashboard/category' },
-								{ label: 'View FeedBack', path: '/dashboard/feedback' },
+								{ label: 'View Order', path: '/dashboard/order' },
 							],
 						},
 						{

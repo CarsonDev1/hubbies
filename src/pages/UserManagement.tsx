@@ -1,31 +1,12 @@
+import React from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import {
-	Dialog,
-	DialogTrigger,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogDescription,
-	DialogFooter,
-} from '../components/ui/dialog';
-import { useState } from 'react';
-import { Button } from '../components/ui/button';
-import { Label } from '../components/ui/label';
-import { Input } from '../components/ui/input';
-import { MapPinIcon, EditIcon, TrashIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import Swal from 'sweetalert2';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { InvalidateQueryFilters, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { deleteCategory } from '../api/category/deleteCategories';
 import { getCustomers } from '../api/user/getCustomers';
 import { getEvenHosts } from '../api/user/getEvenHosts';
-
-type UserFormData = {
-	name: string;
-	address: string;
-};
+import { LockIcon, UnlockIcon } from 'lucide-react'; // Assuming UnlockIcon is available
+import Swal from 'sweetalert2';
+import { lockAccount } from '../api/user/lockUser';
+import { unlockAccount } from '../api/user/unlockUser';
 
 export interface User {
 	id: string;
@@ -38,28 +19,10 @@ export interface User {
 	address: string;
 }
 
-const schema = z.object({
-	name: z.string().nonempty({ message: 'Name is required' }),
-	address: z.string().nonempty({ message: 'Address is required' }),
-});
-
 const UserManagement: React.FC = () => {
 	const queryClient = useQueryClient();
-	const [isOpen, setIsOpen] = useState(false);
-	const [isAdding, setIsAdding] = useState<boolean>(false);
-	const [currentCategory, setCurrentCategory] = useState<User | null>(null);
 
-	const {
-		register,
-		handleSubmit,
-		reset,
-		formState: { errors },
-		setValue,
-	} = useForm<UserFormData>({
-		resolver: zodResolver(schema),
-		defaultValues: { name: '', address: '' },
-	});
-
+	// Fetch customers and event hosts
 	const { data, isLoading, isError } = useQuery<User[]>({
 		queryKey: ['listCustomers'],
 		queryFn: getCustomers,
@@ -70,6 +33,90 @@ const UserManagement: React.FC = () => {
 		queryFn: getEvenHosts,
 	});
 
+	// Mutation for locking an account
+	const { mutate: mutateLockAccount } = useMutation({
+		mutationFn: (accountId: string) => lockAccount(accountId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['listCustomers'] });
+			queryClient.invalidateQueries({ queryKey: ['listEventHosts'] });
+			Swal.fire({
+				title: 'Success!',
+				text: 'The account has been locked successfully.',
+				icon: 'success',
+				confirmButtonText: 'OK',
+			});
+		},
+		onError: () => {
+			Swal.fire({
+				title: 'Error!',
+				text: `Failed to lock the account.`,
+				icon: 'error',
+				confirmButtonText: 'OK',
+			});
+		},
+	});
+
+	// Mutation for unlocking an account
+	const { mutate: mutateUnlockAccount } = useMutation({
+		mutationFn: (accountId: string) => unlockAccount(accountId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ['listCustomers'] });
+			queryClient.invalidateQueries({ queryKey: ['listEventHosts'] });
+			Swal.fire({
+				title: 'Success!',
+				text: 'The account has been unlocked successfully.',
+				icon: 'success',
+				confirmButtonText: 'OK',
+			});
+		},
+		onError: () => {
+			Swal.fire({
+				title: 'Error!',
+				text: `Failed to unlock the account.`,
+				icon: 'error',
+				confirmButtonText: 'OK',
+			});
+		},
+	});
+
+	// Format date
+	const formatDate = (dateString: string) => {
+		const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+		return new Date(dateString).toLocaleDateString(undefined, options);
+	};
+
+	// Handle lock account click
+	const handleLockAccount = (accountId: string) => {
+		Swal.fire({
+			title: 'Are you sure?',
+			text: 'This account will be locked!',
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: 'Yes, lock it!',
+			cancelButtonText: 'Cancel',
+		}).then((result) => {
+			if (result.isConfirmed) {
+				mutateLockAccount(accountId);
+			}
+		});
+	};
+
+	// Handle unlock account click
+	const handleUnlockAccount = (accountId: string) => {
+		Swal.fire({
+			title: 'Are you sure?',
+			text: 'This account will be unlocked!',
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: 'Yes, unlock it!',
+			cancelButtonText: 'Cancel',
+		}).then((result) => {
+			if (result.isConfirmed) {
+				mutateUnlockAccount(accountId);
+			}
+		});
+	};
+
 	if (isLoading) {
 		return <div>Loading...</div>;
 	}
@@ -77,15 +124,10 @@ const UserManagement: React.FC = () => {
 		return <div>Error occurred</div>;
 	}
 
-	const formatDate = (dateString: string) => {
-		const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
-		return new Date(dateString).toLocaleDateString(undefined, options);
-	};
-
 	return (
 		<div className='p-4'>
 			<div className='flex items-center justify-between mb-4'>
-				<h2 className='text-xl font-bold'>User Details</h2>
+				<h2 className='text-xl font-bold'>User</h2>
 			</div>
 
 			<Table className='min-w-full bg-transparent border border-gray-200'>
@@ -113,7 +155,19 @@ const UserManagement: React.FC = () => {
 							<TableCell className='px-4 py-2 border-b'>{user.address}</TableCell>
 							<TableCell className='px-4 py-2 border-b'>
 								<div className='flex space-x-4'>
-									<TrashIcon className='cursor-pointer text-red-500' size={16} />
+									{user.isLocked ? (
+										<UnlockIcon
+											className='text-green-500 cursor-pointer'
+											size={16}
+											onClick={() => handleUnlockAccount(user.id)}
+										/>
+									) : (
+										<LockIcon
+											className='text-red-500 cursor-pointer'
+											size={16}
+											onClick={() => handleLockAccount(user.id)}
+										/>
+									)}
 								</div>
 							</TableCell>
 						</TableRow>
@@ -121,7 +175,7 @@ const UserManagement: React.FC = () => {
 				</TableBody>
 			</Table>
 
-			<h2 className='text-xl font-bold mt-8'>Event Hosts</h2>
+			<h2 className='mt-8 text-xl font-bold'>Event Hosts</h2>
 			<Table className='min-w-full bg-transparent border border-gray-200'>
 				<TableHeader className='bg-primary-color'>
 					<TableRow>
@@ -147,7 +201,19 @@ const UserManagement: React.FC = () => {
 							<TableCell className='px-4 py-2 border-b'>{user.address}</TableCell>
 							<TableCell className='px-4 py-2 border-b'>
 								<div className='flex space-x-4'>
-									<TrashIcon className='cursor-pointer text-red-500' size={16} />
+									{user.isLocked ? (
+										<UnlockIcon
+											className='text-green-500 cursor-pointer'
+											size={16}
+											onClick={() => handleUnlockAccount(user.id)}
+										/>
+									) : (
+										<LockIcon
+											className='text-red-500 cursor-pointer'
+											size={16}
+											onClick={() => handleLockAccount(user.id)}
+										/>
+									)}
 								</div>
 							</TableCell>
 						</TableRow>

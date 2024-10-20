@@ -8,7 +8,7 @@ export const createCategory = async (categoryDetails: FormData) => {
 			},
 		});
 		return response.data;
-	} catch (error) {
+	} catch {
 		throw new Error('Error creating category');
 	}
 };

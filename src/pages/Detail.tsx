@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getTicketEventsById } from '../api/tickets/getTicketId';
 import { Card, CardContent } from '../components/ui/card';
 import NeighBor from '../assets/images/landing-img-01.png';
 import { Button } from '../components/ui/button';
+import { toast } from 'react-toastify';
 
 const Cart = () => {
 	// Lấy ticketId từ URL
@@ -20,7 +22,45 @@ const Cart = () => {
 		enabled: !!ticketId,
 	});
 
-	console.log('tickettt', ticket);
+	// State to manage quantity
+	const [quantity, setQuantity] = useState(1);
+
+	// Update quantity when ticket data is fetched
+	useEffect(() => {
+		if (ticket && ticket.quantity) {
+			setQuantity(ticket.quantity);
+		}
+	}, [ticket]);
+
+	// Function to handle adding to cart
+	const handleAddToCart = useCallback(() => {
+		const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+		// Lưu tất cả thông tin sản phẩm vào giỏ hàng
+		const newCart = [
+			...storedCart,
+			{
+				ticketId,
+				name: ticket.name,
+				image: ticket.image,
+				quantity,
+				price: ticket.price,
+				address: ticket.address,
+				description: ticket.description,
+				host: 'Chika Pottery',
+				postDate: ticket.postDate,
+			},
+		];
+
+		localStorage.setItem('cart', JSON.stringify(newCart));
+
+		// Hiển thị toast thông báo một lần
+		toast.success('Add to cart success!', { position: 'top-right', autoClose: 3000 });
+
+		// Trigger a custom event to notify RootLayout to update the cart count
+		const event = new Event('cart-updated');
+		window.dispatchEvent(event);
+	}, [ticketId, ticket, quantity]);
 
 	if (!ticketId) {
 		return <p>Error: Ticket ID is missing</p>;
@@ -37,40 +77,23 @@ const Cart = () => {
 						<div className='flex flex-col w-full gap-4 sm:w-2/4'>
 							<img
 								src={ticket.image}
-								alt='Pottery hands'
+								alt='Ticket image'
 								width={400}
 								height={400}
 								className='object-cover mx-auto rounded-lg'
 							/>
 							<div className='flex flex-col items-center gap-5 mb-4 sm:flex-row'>
-								<div className='flex items-center'>
-									<Button
-										variant='ghost'
-										size='icon'
-										// onClick={() => setQuantity(Math.max(1, quantity - 1))}
-										className='text-xl'
-									>
-										-
-									</Button>
-									<span className='p-1 px-3 text-xl font-semibold border rounded-md border-button-color'>
-										{ticket.quantity}
-									</span>
-									<Button
-										variant='ghost'
-										size='icon'
-										// onClick={() => setQuantity(quantity + 1)}
-										className='text-xl'
-									>
-										+
-									</Button>
-								</div>
 								<div className='flex items-center gap-4 mt-4 sm:mt-0'>
-									<Button className='w-full sm:w-max bg-[#f0c14b] hover:bg-[#ddb347] text-black font-bold py-2 px-4 rounded-full'>
-										PLACE PAYMENT
+									<Button
+										className='w-full sm:w-max bg-[#f0c14b] hover:bg-[#ddb347] text-black font-bold py-2 px-4 rounded-full'
+										onClick={handleAddToCart}
+									>
+										ADD TO CART
 									</Button>
 								</div>
 							</div>
 						</div>
+						{/* Ticket Details */}
 						<div className='w-full sm:w-3/4'>
 							<div className='flex flex-col items-center gap-3 md:items-start'>
 								<h2 className='mb-1 text-2xl font-bold text-center sm:text-left'>{ticket.name}</h2>
