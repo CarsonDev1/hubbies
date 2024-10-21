@@ -63,10 +63,10 @@ const FormAuth: React.FC = () => {
 					const { accessToken, refreshToken } = response.data;
 					login({ accessToken, refreshToken });
 					const decoded: any = jwtDecode(accessToken);
-					if (decoded?.role === 'EventHost') {
-						navigate('/');
-					} else {
+					if (decoded?.role === 'Admin') {
 						navigate('/dashboard');
+					} else {
+						navigate('/');
 					}
 					toast.success('Login successful!');
 					window.location.reload();

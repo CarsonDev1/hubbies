@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Suspense } from 'react';
+import { Suspense, useState, useCallback } from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import AvtContent01 from '../assets/images/avt-content-01.png';
-import { useState } from 'react';
 import { LuMap } from 'react-icons/lu';
 import { IoPaperPlaneOutline } from 'react-icons/io5';
 import LoadingSpinner from '../components/Loading/LoadingSpinner';
@@ -11,8 +9,8 @@ import { useAuth } from '../contexts/AuthContextMain';
 import { jwtDecode } from 'jwt-decode';
 import { useQuery } from '@tanstack/react-query';
 import { getTicketEvents } from '../api/tickets/getTicket';
-import { TicketPost } from './TicketPost';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Home = () => {
 	const { isAuthenticated, user } = useAuth();
@@ -30,6 +28,35 @@ const Home = () => {
 		queryFn: () => getTicketEvents(page, pageSize),
 		select: (response) => response.data,
 	});
+
+	// Function to handle adding an event to the cart
+	const handleAddToCart = useCallback((event: any) => {
+		const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+		// Add selected event to the cart
+		const newCart = [
+			...storedCart,
+			{
+				ticketId: event.id,
+				name: event.name,
+				image: event.image,
+				price: event.price,
+				address: event.address,
+				description: event.description,
+				host: 'Chika Pottery',
+				postDate: event.postDate,
+			},
+		];
+
+		localStorage.setItem('cart', JSON.stringify(newCart));
+
+		// Show success toast notification
+		toast.success('Add to cart success!', { position: 'top-right', autoClose: 3000 });
+
+		// Trigger a custom event to notify RootLayout to update the cart count
+		const cartUpdatedEvent = new Event('cart-updated');
+		window.dispatchEvent(cartUpdatedEvent);
+	}, []);
 
 	if (isLoading) {
 		return <p>Loading...</p>;
@@ -52,10 +79,10 @@ const Home = () => {
 			<div>
 				<div className='flex flex-col gap-4 md:flex-row'>
 					<div className='w-full md:w-2/3 px-2 md:px-6 lg:px-8 xl:w-[65%]'>
-						{data?.map((event: TicketPost) => (
+						{data?.map((event: any) => (
 							<div className='space-y-6' key={event.id}>
 								{/* Content Cards */}
-								<Card className='overflow-hidden bg-transparent border rounded-3xl border-button-color'>
+								<Card className='overflow-hidden bg-transparent border rounded-3xl mb-5 border-button-color'>
 									<CardContent className='p-4'>
 										<div className='flex items-center mb-2'>
 											<img
@@ -98,6 +125,7 @@ const Home = () => {
 												<Button
 													variant='ghost'
 													className='px-3 md:px-10 xl:px-20 text-sm rounded-full bg-[#FFD583] hover:bg-orange-500 hover:text-white'
+													onClick={() => handleAddToCart(event)}
 												>
 													ADD TO CART
 												</Button>
