@@ -223,9 +223,11 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, activeTab, setActiveT
 									className='pl-5 xl:pl-10 pr-3 py-2 xl:py-4 border border-button-color rounded-full w-80 xl:w-96 bg-transparent focus:outline-none placeholder:text-[#D1B186]'
 								/>
 							</div>
-							<div className='bg-[#ffca66] p-3 rounded-full' onClick={() => setIsDialogOpen(true)}>
-								<Camera className='text-button-color' />
-							</div>
+							{decodedRole === 'EventHost' && (
+								<div className='bg-[#ffca66] p-3 rounded-full' onClick={() => setIsDialogOpen(true)}>
+									<Camera className='text-button-color' />
+								</div>
+							)}
 						</div>
 						<div className='flex items-center gap-6'>
 							<div className='flex items-center space-x-2' onClick={logout}>
