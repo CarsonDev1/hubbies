@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Card, CardContent } from '../components/ui/card';
 import NeighBor from '../assets/images/landing-img-01.png';
@@ -73,6 +73,25 @@ const CartPayment = () => {
 				[ticketId]: prev[ticketId] - cartItems.find((item) => item.ticketId === ticketId).price,
 			}));
 		}
+	};
+
+	const handleRemoveItem = (ticketId: string) => {
+		// Cập nhật state cartItems
+		const updatedCartItems = cartItems.filter((item) => item.ticketId !== ticketId);
+		setCartItems(updatedCartItems);
+
+		// Cập nhật state quantity và subtotals
+		const { [ticketId]: _, ...updatedQuantities } = quantity;
+		setQuantity(updatedQuantities);
+
+		const { [ticketId]: __, ...updatedSubtotals } = subtotals;
+		setSubtotals(updatedSubtotals);
+
+		// Cập nhật localStorage
+		localStorage.setItem('cart', JSON.stringify(updatedCartItems));
+
+		// Hiển thị thông báo
+		toast.success('Item removed successfully!', { position: 'top-right', autoClose: 3000 });
 	};
 
 	const handlePlacePayment = () => {
@@ -190,6 +209,13 @@ const CartPayment = () => {
 											onClick={handlePlacePayment}
 										>
 											PLACE PAYMENT
+										</Button>
+										<Button
+											variant='destructive'
+											onClick={() => handleRemoveItem(ticket.ticketId)}
+											className='bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full'
+										>
+											Remove
 										</Button>
 									</div>
 								</div>

@@ -230,7 +230,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, activeTab, setActiveT
 							)}
 						</div>
 						<div className='flex items-center gap-6'>
-							<div className='flex items-center space-x-2' onClick={logout}>
+							<div className='flex items-center space-x-2'>
 								<img src={Avt} alt='User' width={54} height={54} className='rounded-full' />
 								<div className='flex flex-col gap-1'>
 									{user ? (
@@ -246,6 +246,11 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, activeTab, setActiveT
 										<p>Loading user information...</p>
 									)}
 								</div>
+								{user && (
+									<span className='text-red-500 font-semibold cursor-pointer' onClick={logout}>
+										Logout
+									</span>
+								)}
 							</div>
 							<Link to='/cart-payment'>
 								<div className='relative'>
