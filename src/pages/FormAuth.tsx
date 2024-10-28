@@ -49,25 +49,27 @@ const FormAuth: React.FC = () => {
 		setLoading(true);
 
 		try {
-			if (!isLogin) {
-				const response = await axiosInstance.post('/auths/register', data);
-				if (response.status === 200) {
+			const queryParams = new URLSearchParams(location.search);
+			const role = queryParams.get('role');
+			const endpoint = !isLogin
+				? role === 'Eventhost'
+					? '/auths/register?role=Eventhost'
+					: '/auths/register'
+				: '/auths/login';
+
+			const response = await axiosInstance.post(endpoint, data);
+
+			if (response.status === 200) {
+				if (!isLogin) {
 					navigate('/login');
 					toast.success('Registration successful!');
-				}
-			} else {
-				const response = await axiosInstance.post('/auths/login', data);
-				if (response.status === 200) {
+				} else {
 					localStorage.setItem('token', response.data.accessToken);
 					localStorage.setItem('refreshToken', response.data.refreshToken);
 					const { accessToken, refreshToken } = response.data;
 					login({ accessToken, refreshToken });
 					const decoded: any = jwtDecode(accessToken);
-					if (decoded?.role === 'Admin') {
-						navigate('/dashboard');
-					} else {
-						navigate('/');
-					}
+					navigate(decoded?.role === 'Admin' ? '/dashboard' : '/');
 					toast.success('Login successful!');
 					window.location.reload();
 				}

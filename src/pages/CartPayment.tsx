@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
@@ -33,10 +34,22 @@ const CartPayment = () => {
 
 	const mutation = useMutation({
 		mutationFn: createOrder,
-		onSuccess: () => {
-			toast.success('Payment placed successfully!', { position: 'top-right', autoClose: 3000 });
-			localStorage.removeItem('cart');
-			setCartItems([]);
+		onSuccess: (data) => {
+			if (data?.paymentUrl && data?.paymentReference) {
+				localStorage.setItem('paymentReference', data.paymentReference);
+
+				toast.success('Payment placed successfully! Redirecting to payment...', {
+					position: 'top-right',
+					autoClose: 3000,
+				});
+
+				window.location.href = data.paymentUrl;
+
+				localStorage.removeItem('cart');
+				setCartItems([]);
+			} else {
+				toast.success('Payment placed successfully!', { position: 'top-right', autoClose: 3000 });
+			}
 		},
 		onError: (error: any) => {
 			if (error.response?.data?.detail?.includes('Unsufficient quantity')) {
@@ -213,7 +226,7 @@ const CartPayment = () => {
 										<Button
 											variant='destructive'
 											onClick={() => handleRemoveItem(ticket.ticketId)}
-											className='bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full'
+											className='px-4 py-2 font-bold text-white bg-red-500 rounded-full hover:bg-red-600'
 										>
 											Remove
 										</Button>

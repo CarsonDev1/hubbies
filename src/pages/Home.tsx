@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Suspense, useState, useCallback } from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
@@ -82,7 +83,7 @@ const Home = () => {
 						{data?.map((event: any) => (
 							<div className='space-y-6' key={event.id}>
 								{/* Content Cards */}
-								<Card className='overflow-hidden bg-transparent border rounded-3xl mb-5 border-button-color'>
+								<Card className='mb-5 overflow-hidden bg-transparent border rounded-3xl border-button-color'>
 									<CardContent className='p-4'>
 										<div className='flex items-center mb-2'>
 											<img
