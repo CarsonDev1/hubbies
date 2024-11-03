@@ -26,6 +26,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContextMain';
 import CartPayment from './pages/CartPayment';
 import ViewOrder from './pages/ViewOrder';
 import PaymentSuccess from './pages/SuccessPayment';
+import PaymentFail from './pages/FailPayment';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const { isAuthenticated } = useAuth();
@@ -96,6 +97,16 @@ const App: React.FC = () => {
 						<ProtectedRoute>
 							<>
 								<PaymentSuccess />
+							</>
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path='/failed-payment'
+					element={
+						<ProtectedRoute>
+							<>
+								<PaymentFail />
 							</>
 						</ProtectedRoute>
 					}
