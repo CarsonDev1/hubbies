@@ -80,7 +80,7 @@ const Dashboard: React.FC = () => {
 										<th className='px-4 py-2 text-left'>EID</th>
 										<th className='px-4 py-2 text-left'>HID</th>
 										<th className='px-4 py-2 text-left'>EventName</th>
-										<th className='px-4 py-2 text-left'>TotalCare</th>
+										<th className='px-4 py-2 text-left'>Revenue</th>
 										<th className='px-4 py-2 text-left'>TotalJoin</th>
 										<th className='px-4 py-2 text-center'>Tag</th>
 										<th className='px-4 py-2 text-left'>TotalFeedback</th>
@@ -91,32 +91,32 @@ const Dashboard: React.FC = () => {
 									<tr>
 										<td className='px-4 py-2'>00001</td>
 										<td className='px-4 py-2'>00008</td>
-										<td className='px-4 py-2'>Local Market</td>
-										<td className='px-4 py-2'>120</td>
+										<td className='px-4 py-2'>Piano Steinway & Sons</td>
+										<td className='px-4 py-2'>50,000 VND</td>
 										<td className='px-4 py-2'>100</td>
 										<td className='px-4 py-2'>Tag1, Tag2...</td>
 										<td className='px-12 py-2'>80</td>
-										<td className='px-4 py-2'>18/10/2024</td>
+										<td className='px-4 py-2'>16/11/2024</td>
 									</tr>
 									<tr>
 										<td className='px-4 py-2'>00002</td>
 										<td className='px-4 py-2'>00008</td>
-										<td className='px-4 py-2'>Drawing</td>
-										<td className='px-4 py-2'>80</td>
+										<td className='px-4 py-2'>Gốm Sài Gòn</td>
+										<td className='px-4 py-2'>450,000 VND</td>
 										<td className='px-4 py-2'>65</td>
 										<td className='px-4 py-2'>Tag1, Tag2...</td>
 										<td className='px-12 py-2'>55</td>
-										<td className='px-4 py-2'>7/6/2024</td>
+										<td className='px-4 py-2'>11/7/2024</td>
 									</tr>
 									<tr>
 										<td className='px-4 py-2'>00003</td>
 										<td className='px-4 py-2'>00010</td>
-										<td className='px-4 py-2'>Photograph</td>
-										<td className='px-4 py-2'>70</td>
+										<td className='px-4 py-2'>Hien Concept</td>
+										<td className='px-4 py-2'>450,000 VND</td>
 										<td className='px-4 py-2'>55</td>
 										<td className='px-4 py-2'>Tag1, Tag2...</td>
 										<td className='px-12 py-2'>50</td>
-										<td className='px-4 py-2'>22/2/2024</td>
+										<td className='px-4 py-2'>11/8/2024</td>
 									</tr>
 								</tbody>
 							</table>
